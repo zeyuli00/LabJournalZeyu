@@ -16,9 +16,8 @@ To use this, follow the steps below.
 
 In this step you'll make a personal copy of this repository on your GitHub account, which you can customize and use for your own purposes. This is done by "forking" the repository. To do this:
 
-1. Navigate to https://rensec.github.io/LabJournal/; 
-2. Fork the repository using the fork button in the top right hand corner of Github, to make a personal copy of this lab journal;
-3. Under your repository name, navigate to 'Settings'; click on 'Pages' on the sidebar; select the main-branch as your publishing source, and "serve" from the "docs"-folder. This means that the files in the docs folder will be published as a website. Save your settings.
+1. Fork the repository using the fork button in the top right hand corner of Github, to make a personal copy of this lab journal;
+2. Under your repository name, navigate to 'Settings'; click on 'Pages' on the sidebar; select the main-branch as your publishing source, and "serve" from the "docs"-folder. This means that the files in the docs folder will be published as a website. Save your settings.
 
 
 You now have a personal copy of this repository on your account, which publishes html files (aka Github pages) as a website.
