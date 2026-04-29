@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zeyu(Zey)" />
+
+<meta name="date" content="2026-04-30" />
+
+<title>Tutorial3_Knecht data</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    My journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Tutorial1_Data-handling.html">Tutorial1-Data handling</a>
+    </li>
+    <li>
+      <a href="Tutroial2-basic-analysis.html">Tutroial2-Basic analysis</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/robfranken/LabJournal">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Tutorial3_Knecht data</h1>
+<h4 class="author">Zeyu(Zey)</h4>
+<h4 class="date">2026-04-30</h4>
+
+</div>
+
+
+<div id="r-markdown" class="section level2" number="1">
+<h2><span class="header-section-number">1</span> R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting
+syntax for authoring HTML, PDF, and MS Word documents. For more details
+on using R Markdown see <a href="http://rmarkdown.rstudio.com"
+class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be
+generated that includes both content as well as the output of any
+embedded R code chunks within the document. You can embed an R code
+chunk like this:</p>
+<pre class="r"><code>summary(cars)</code></pre>
+<pre><code>##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00</code></pre>
+</div>
+<div id="including-plots" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="Tutorial3_Knecht-data_files/figure-html/pressure-1.png" alt="" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the
+code chunk to prevent printing of the R code that generated the
+plot.</p>
+</div>
+<div id="a-first-look-at-the-data" class="section level2" number="3">
+<h2><span class="header-section-number">3</span> 3.1 A first look at the
+data</h2>
+<p>Load packages</p>
+<pre class="r"><code>library(igraph)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     decompose, spectrum</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     union</code></pre>
+<pre class="r"><code>library(haven) # to read Stata files
+library(reshape2)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.0     ✔ readr     2.1.6
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.2     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ lubridate::%--%()      masks igraph::%--%()
+## ✖ dplyr::as_data_frame() masks tibble::as_data_frame(), igraph::as_data_frame()
+## ✖ purrr::compose()       masks igraph::compose()
+## ✖ tidyr::crossing()      masks igraph::crossing()
+## ✖ dplyr::filter()        masks stats::filter()
+## ✖ dplyr::lag()           masks stats::lag()
+## ✖ purrr::simplify()      masks igraph::simplify()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<p>Read data</p>
+<pre class="r"><code>PupilsWaveV &lt;- read_dta(file = &quot;PupilsWaveV.dta&quot;)</code></pre>
+<p><strong>QUESTION</strong>: Have a close look at these two variables,
+comparing the <em>namenr</em> values for different classes (just
+eyeballing the data should be sufficient). What do you notice?</p>
+<p>2-level data?</p>
+<pre class="r"><code>#select only one class
+class12b &lt;- PupilsWaveV %&gt;% 
+  filter(schoolnr == &quot;12b&quot;)  # keep only one class</code></pre>
+</div>
+<div id="assignment" class="section level2" number="4">
+<h2><span class="header-section-number">4</span> 3.2 Assignment</h2>
+<p>1.</p>
+<pre class="r"><code>f_elist_from_12b &lt;- class12b
+f_elist_from_12b &lt;-  select(f_elist_from_12b, namenr, friend1:friend12) # keep only the network variables (and id)
+f_elist_from_12b &lt;-  melt(f_elist_from_12b, id.vars = &quot;namenr&quot;) # from the reshape2 package
+f_elist_from_12b</code></pre>
+<pre><code>##     namenr variable value
+## 1        1  friend1    12
+## 2        2  friend1    10
+## 3        3  friend1     2
+## 4        4  friend1    18
+## 5        5  friend1    14
+## 6        6  friend1    15
+## 7        7  friend1     2
+## 8        8  friend1    10
+## 9        9  friend1    24
+## 10      10  friend1     8
+## 11      11  friend1    21
+## 12      12  friend1     1
+## 13      13  friend1    26
+## 14      14  friend1    23
+## 15      15  friend1    NA
+## 16      16  friend1    25
+## 17      17  friend1    22
+## 18      18  friend1     4
+## 19      19  friend1    20
+## 20      20  friend1    22
+## 21      21  friend1    11
+## 22      22  friend1    17
+## 23      23  friend1     4
+## 24      24  friend1     6
+## 25      25  friend1    16
+## 26      26  friend1    13
+## 27       1  friend2     3
+## 28       2  friend2     7
+## 29       3  friend2     6
+## 30       4  friend2    23
+## 31       5  friend2    16
+## 32       6  friend2     3
+## 33       7  friend2     3
+## 34       8  friend2     4
+## 35       9  friend2    15
+## 36      10  friend2     2
+## 37      11  friend2    17
+## 38      12  friend2     3
+## 39      13  friend2     4
+## 40      14  friend2    18
+## 41      15  friend2    NA
+## 42      16  friend2    NA
+## 43      17  friend2    NA
+## 44      18  friend2    23
+## 45      19  friend2    22
+## 46      20  friend2    19
+## 47      21  friend2    NA
+## 48      22  friend2    19
+## 49      23  friend2     8
+## 50      24  friend2     2
+## 51      25  friend2    14
+## 52      26  friend2    NA
+## 53       1  friend3     6
+## 54       2  friend3     8
+## 55       3  friend3     7
+## 56       4  friend3     8
+## 57       5  friend3    25
+## 58       6  friend3    12
+## 59       7  friend3    12
+## 60       8  friend3    18
+## 61       9  friend3     3
+## 62      10  friend3    15
+## 63      11  friend3    NA
+## 64      12  friend3     7
+## 65      13  friend3    18
+## 66      14  friend3     4
+## 67      15  friend3    NA
+## 68      16  friend3    NA
+## 69      17  friend3    NA
+## 70      18  friend3    10
+## 71      19  friend3    NA
+## 72      20  friend3    NA
+## 73      21  friend3    NA
+## 74      22  friend3    20
+## 75      23  friend3    10
+## 76      24  friend3     9
+## 77      25  friend3    NA
+## 78      26  friend3    NA
+## 79       1  friend4    NA
+## 80       2  friend4    NA
+## 81       3  friend4    12
+## 82       4  friend4    10
+## 83       5  friend4    NA
+## 84       6  friend4    21
+## 85       7  friend4    10
+## 86       8  friend4    23
+## 87       9  friend4     1
+## 88      10  friend4    23
+## 89      11  friend4    NA
+## 90      12  friend4     6
+## 91      13  friend4    23
+## 92      14  friend4    25
+## 93      15  friend4    NA
+## 94      16  friend4    NA
+## 95      17  friend4    NA
+## 96      18  friend4     2
+## 97      19  friend4    NA
+## 98      20  friend4    NA
+## 99      21  friend4    NA
+## 100     22  friend4    NA
+## 101     23  friend4    18
+## 102     24  friend4    NA
+## 103     25  friend4    NA
+## 104     26  friend4    NA
+## 105      1  friend5    NA
+## 106      2  friend5    NA
+## 107      3  friend5     1
+## 108      4  friend5    NA
+## 109      5  friend5    NA
+## 110      6  friend5    11
+## 111      7  friend5    NA
+## 112      8  friend5    NA
+## 113      9  friend5     2
+## 114     10  friend5    NA
+## 115     11  friend5    NA
+## 116     12  friend5     2
+## 117     13  friend5    NA
+## 118     14  friend5     5
+## 119     15  friend5    NA
+## 120     16  friend5    NA
+## 121     17  friend5    NA
+## 122     18  friend5    13
+## 123     19  friend5    NA
+## 124     20  friend5    NA
+## 125     21  friend5    NA
+## 126     22  friend5    NA
+## 127     23  friend5    NA
+## 128     24  friend5    NA
+## 129     25  friend5    NA
+## 130     26  friend5    NA
+## 131      1  friend6    NA
+## 132      2  friend6    NA
+## 133      3  friend6    NA
+## 134      4  friend6    NA
+## 135      5  friend6    NA
+## 136      6  friend6    NA
+## 137      7  friend6    NA
+## 138      8  friend6    NA
+## 139      9  friend6     7
+## 140     10  friend6    NA
+## 141     11  friend6    NA
+## 142     12  friend6     8
+## 143     13  friend6    NA
+## 144     14  friend6    NA
+## 145     15  friend6    NA
+## 146     16  friend6    NA
+## 147     17  friend6    NA
+## 148     18  friend6     8
+## 149     19  friend6    NA
+## 150     20  friend6    NA
+## 151     21  friend6    NA
+## 152     22  friend6    NA
+## 153     23  friend6    NA
+## 154     24  friend6    NA
+## 155     25  friend6    NA
+## 156     26  friend6    NA
+## 157      1  friend7    NA
+## 158      2  friend7    NA
+## 159      3  friend7    NA
+## 160      4  friend7    NA
+## 161      5  friend7    NA
+## 162      6  friend7    NA
+## 163      7  friend7    NA
+## 164      8  friend7    NA
+## 165      9  friend7    11
+## 166     10  friend7    NA
+## 167     11  friend7    NA
+## 168     12  friend7    22
+## 169     13  friend7    NA
+## 170     14  friend7    NA
+## 171     15  friend7    NA
+## 172     16  friend7    NA
+## 173     17  friend7    NA
+## 174     18  friend7     7
+## 175     19  friend7    NA
+## 176     20  friend7    NA
+## 177     21  friend7    NA
+## 178     22  friend7    NA
+## 179     23  friend7    NA
+## 180     24  friend7    NA
+## 181     25  friend7    NA
+## 182     26  friend7    NA
+## 183      1  friend8    NA
+## 184      2  friend8    NA
+## 185      3  friend8    NA
+## 186      4  friend8    NA
+## 187      5  friend8    NA
+## 188      6  friend8    NA
+## 189      7  friend8    NA
+## 190      8  friend8    NA
+## 191      9  friend8     6
+## 192     10  friend8    NA
+## 193     11  friend8    NA
+## 194     12  friend8    10
+## 195     13  friend8    NA
+## 196     14  friend8    NA
+## 197     15  friend8    NA
+## 198     16  friend8    NA
+## 199     17  friend8    NA
+## 200     18  friend8    NA
+## 201     19  friend8    NA
+## 202     20  friend8    NA
+## 203     21  friend8    NA
+## 204     22  friend8    NA
+## 205     23  friend8    NA
+## 206     24  friend8    NA
+## 207     25  friend8    NA
+## 208     26  friend8    NA
+## 209      1  friend9    NA
+## 210      2  friend9    NA
+## 211      3  friend9    NA
+## 212      4  friend9    NA
+## 213      5  friend9    NA
+## 214      6  friend9    NA
+## 215      7  friend9    NA
+## 216      8  friend9    NA
+## 217      9  friend9    12
+## 218     10  friend9    NA
+## 219     11  friend9    NA
+## 220     12  friend9    NA
+## 221     13  friend9    NA
+## 222     14  friend9    NA
+## 223     15  friend9    NA
+## 224     16  friend9    NA
+## 225     17  friend9    NA
+## 226     18  friend9    NA
+## 227     19  friend9    NA
+## 228     20  friend9    NA
+## 229     21  friend9    NA
+## 230     22  friend9    NA
+## 231     23  friend9    NA
+## 232     24  friend9    NA
+## 233     25  friend9    NA
+## 234     26  friend9    NA
+## 235      1 friend10    NA
+## 236      2 friend10    NA
+## 237      3 friend10    NA
+## 238      4 friend10    NA
+## 239      5 friend10    NA
+## 240      6 friend10    NA
+## 241      7 friend10    NA
+## 242      8 friend10    NA
+## 243      9 friend10     8
+## 244     10 friend10    NA
+## 245     11 friend10    NA
+## 246     12 friend10    NA
+## 247     13 friend10    NA
+## 248     14 friend10    NA
+## 249     15 friend10    NA
+## 250     16 friend10    NA
+## 251     17 friend10    NA
+## 252     18 friend10    NA
+## 253     19 friend10    NA
+## 254     20 friend10    NA
+## 255     21 friend10    NA
+## 256     22 friend10    NA
+## 257     23 friend10    NA
+## 258     24 friend10    NA
+## 259     25 friend10    NA
+## 260     26 friend10    NA
+## 261      1 friend11    NA
+## 262      2 friend11    NA
+## 263      3 friend11    NA
+## 264      4 friend11    NA
+## 265      5 friend11    NA
+## 266      6 friend11    NA
+## 267      7 friend11    NA
+## 268      8 friend11    NA
+## 269      9 friend11    NA
+## 270     10 friend11    NA
+## 271     11 friend11    NA
+## 272     12 friend11    NA
+## 273     13 friend11    NA
+## 274     14 friend11    NA
+## 275     15 friend11    NA
+## 276     16 friend11    NA
+## 277     17 friend11    NA
+## 278     18 friend11    NA
+## 279     19 friend11    NA
+## 280     20 friend11    NA
+## 281     21 friend11    NA
+## 282     22 friend11    NA
+## 283     23 friend11    NA
+## 284     24 friend11    NA
+## 285     25 friend11    NA
+## 286     26 friend11    NA
+## 287      1 friend12    NA
+## 288      2 friend12    NA
+## 289      3 friend12    NA
+## 290      4 friend12    NA
+## 291      5 friend12    NA
+## 292      6 friend12    NA
+## 293      7 friend12    NA
+## 294      8 friend12    NA
+## 295      9 friend12    NA
+## 296     10 friend12    NA
+## 297     11 friend12    NA
+## 298     12 friend12    NA
+## 299     13 friend12    NA
+## 300     14 friend12    NA
+## 301     15 friend12    NA
+## 302     16 friend12    NA
+## 303     17 friend12    NA
+## 304     18 friend12    NA
+## 305     19 friend12    NA
+## 306     20 friend12    NA
+## 307     21 friend12    NA
+## 308     22 friend12    NA
+## 309     23 friend12    NA
+## 310     24 friend12    NA
+## 311     25 friend12    NA
+## 312     26 friend12    NA</code></pre>
+<pre class="r"><code>f_elist_from_12b &lt;- f_elist_from_12b%&gt;% 
+  filter(!is.na(value)) %&gt;% # drop the missings
+  rename(from =&quot;namenr&quot;, to = &quot;value&quot;, sourcevar= &quot;variable&quot;) %&gt;% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+f_elist_from_12b</code></pre>
+<pre><code>##    from to sourcevar
+## 1     1 12   friend1
+## 2     2 10   friend1
+## 3     3  2   friend1
+## 4     4 18   friend1
+## 5     5 14   friend1
+## 6     6 15   friend1
+## 7     7  2   friend1
+## 8     8 10   friend1
+## 9     9 24   friend1
+## 10   10  8   friend1
+## 11   11 21   friend1
+## 12   12  1   friend1
+## 13   13 26   friend1
+## 14   14 23   friend1
+## 15   16 25   friend1
+## 16   17 22   friend1
+## 17   18  4   friend1
+## 18   19 20   friend1
+## 19   20 22   friend1
+## 20   21 11   friend1
+## 21   22 17   friend1
+## 22   23  4   friend1
+## 23   24  6   friend1
+## 24   25 16   friend1
+## 25   26 13   friend1
+## 26    1  3   friend2
+## 27    2  7   friend2
+## 28    3  6   friend2
+## 29    4 23   friend2
+## 30    5 16   friend2
+## 31    6  3   friend2
+## 32    7  3   friend2
+## 33    8  4   friend2
+## 34    9 15   friend2
+## 35   10  2   friend2
+## 36   11 17   friend2
+## 37   12  3   friend2
+## 38   13  4   friend2
+## 39   14 18   friend2
+## 40   18 23   friend2
+## 41   19 22   friend2
+## 42   20 19   friend2
+## 43   22 19   friend2
+## 44   23  8   friend2
+## 45   24  2   friend2
+## 46   25 14   friend2
+## 47    1  6   friend3
+## 48    2  8   friend3
+## 49    3  7   friend3
+## 50    4  8   friend3
+## 51    5 25   friend3
+## 52    6 12   friend3
+## 53    7 12   friend3
+## 54    8 18   friend3
+## 55    9  3   friend3
+## 56   10 15   friend3
+## 57   12  7   friend3
+## 58   13 18   friend3
+## 59   14  4   friend3
+## 60   18 10   friend3
+## 61   22 20   friend3
+## 62   23 10   friend3
+## 63   24  9   friend3
+## 64    3 12   friend4
+## 65    4 10   friend4
+## 66    6 21   friend4
+## 67    7 10   friend4
+## 68    8 23   friend4
+## 69    9  1   friend4
+## 70   10 23   friend4
+## 71   12  6   friend4
+## 72   13 23   friend4
+## 73   14 25   friend4
+## 74   18  2   friend4
+## 75   23 18   friend4
+## 76    3  1   friend5
+## 77    6 11   friend5
+## 78    9  2   friend5
+## 79   12  2   friend5
+## 80   14  5   friend5
+## 81   18 13   friend5
+## 82    9  7   friend6
+## 83   12  8   friend6
+## 84   18  8   friend6
+## 85    9 11   friend7
+## 86   12 22   friend7
+## 87   18  7   friend7
+## 88    9  6   friend8
+## 89   12 10   friend8
+## 90    9 12   friend9
+## 91    9  8  friend10</code></pre>
+<pre class="r"><code>f_from_12b &lt;- graph_from_data_frame(f_elist_from_12b) #This is a proper igraph graph object
+plot(f_from_12b)</code></pre>
+<p><img src="Tutorial3_Knecht-data_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
+<p>2.</p>
+<pre class="r"><code>is_directed(f_from_12b)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>3.</p>
+<pre class="r"><code>node_attrs &lt;- class12b %&gt;%
+  select(namenr, sex) %&gt;%
+  distinct()
+
+f_from_12b &lt;- graph_from_data_frame(
+  d = f_elist_from_12b,
+  vertices = node_attrs,
+  directed = TRUE
+)
+
+vertex_attr_names(f_from_12b)</code></pre>
+<pre><code>## [1] &quot;name&quot; &quot;sex&quot;</code></pre>
+<pre class="r"><code>unique(V(f_from_12b)$sex)</code></pre>
+<pre><code>## &lt;labelled&lt;double&gt;[2]&gt;: sex of respondent
+## [1] 1 2
+## 
+## Labels:
+##  value  label
+##      1 female
+##      2   male</code></pre>
+<pre class="r"><code>plot(f_from_12b)</code></pre>
+<p><img src="Tutorial3_Knecht-data_files/figure-html/unnamed-chunk-6-1.png" alt="" width="672" /></p>
+<p>4.</p>
+<pre class="r"><code>#Density
+edge_density(f_from_12b)</code></pre>
+<pre><code>## [1] 0.14</code></pre>
+<pre class="r"><code>#0.14
+
+#Number of components
+count_components(f_from_12b)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>#1
+
+#The diameter
+diameter(f_from_12b)</code></pre>
+<pre><code>## [1] 7</code></pre>
+<pre class="r"><code>#7
+
+#The average shortest path length
+mean_distance(f_from_12b)</code></pre>
+<pre><code>## [1] 2.853598</code></pre>
+<pre class="r"><code>#2.853598
+
+#Clustering Coefficient
+transitivity(f_from_12b, type=&quot;average&quot;)</code></pre>
+<pre><code>## [1] 0.5886984</code></pre>
+<pre class="r"><code>#0.5886984</code></pre>
+<p>5.</p>
+<pre class="r"><code>deg &lt;- degree(f_from_12b)
+sex &lt;- V(f_from_12b)$sex
+
+deg_girls &lt;- deg[sex == 1]
+deg_boys  &lt;- deg[sex == 2]
+
+mean(deg_girls)</code></pre>
+<pre><code>## [1] 7.294118</code></pre>
+<pre class="r"><code>mean(deg_boys)</code></pre>
+<pre><code>## [1] 6.444444</code></pre>
+<pre class="r"><code>t.test(deg_girls, deg_boys, alternative = &quot;greater&quot;)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  deg_girls and deg_boys
+## t = 0.6062, df = 16.934, p-value = 0.2762
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  -1.589172       Inf
+## sample estimates:
+## mean of x mean of y 
+##  7.294118  6.444444</code></pre>
+<pre class="r"><code>#Although girls have a slightly higher mean degree (7.29) than boys (6.44), the difference is not statistically significant (Welch t-test, t = 0.61, df = 16.93, p = 0.276). Therefore, we fail to reject the null hypothesis that girls have higher degree than boys in this network.</code></pre>
+<p>6.</p>
+<pre class="r"><code>deg &lt;- degree(f_from_12b)
+sex &lt;- V(f_from_12b)$sex
+
+vertex_colors &lt;- ifelse(sex == 1, &quot;orange&quot;, &quot;darkgreen&quot;)
+
+plot(f_from_12b,
+     vertex.size = deg,
+     vertex.color = vertex_colors,
+     vertex.label = NA,
+     main = &quot;Friendship Network&quot;)
+
+legend(&quot;bottomleft&quot;, 
+       legend = c(&quot;Girls&quot;, &quot;Boys&quot;), 
+       fill = c(&quot;orange&quot;, &quot;darkgreen&quot;))</code></pre>
+<p><img src="Tutorial3_Knecht-data_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" /></p>
+<pre class="r"><code># a better-looking graph advised by AI
+plot(f_from_12b,
+     vertex.size = deg * 0.8,
+     vertex.color = vertex_colors,
+     vertex.label = NA,
+     vertex.frame.color = &quot;white&quot;,
+     edge.arrow.size = 0.2,
+     edge.color = &quot;gray80&quot;,
+     edge.curved = 0.2,
+     layout = layout_with_fr,
+     main = &quot;Friendship Network&quot;)
+
+legend(&quot;bottomleft&quot;,
+       legend = c(&quot;Girls&quot;, &quot;Boys&quot;),
+       fill = c(&quot;orange&quot;, &quot;darkgreen&quot;),
+       border = NA,
+       bty = &quot;n&quot;)    </code></pre>
+<p><img src="Tutorial3_Knecht-data_files/figure-html/unnamed-chunk-9-2.png" alt="" width="672" /></p>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiVHV0b3JpYWwzX0tuZWNodCBkYXRhIgphdXRob3I6ICJaZXl1KFpleSkiCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCIKb3V0cHV0OiBodG1sX2RvY3VtZW50Ci0tLQoKYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9CmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkKYGBgCgojIyBSIE1hcmtkb3duCgpUaGlzIGlzIGFuIFIgTWFya2Rvd24gZG9jdW1lbnQuIE1hcmtkb3duIGlzIGEgc2ltcGxlIGZvcm1hdHRpbmcgc3ludGF4IGZvciBhdXRob3JpbmcgSFRNTCwgUERGLCBhbmQgTVMgV29yZCBkb2N1bWVudHMuIEZvciBtb3JlIGRldGFpbHMgb24gdXNpbmcgUiBNYXJrZG93biBzZWUgPGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20+LgoKV2hlbiB5b3UgY2xpY2sgdGhlICoqS25pdCoqIGJ1dHRvbiBhIGRvY3VtZW50IHdpbGwgYmUgZ2VuZXJhdGVkIHRoYXQgaW5jbHVkZXMgYm90aCBjb250ZW50IGFzIHdlbGwgYXMgdGhlIG91dHB1dCBvZiBhbnkgZW1iZWRkZWQgUiBjb2RlIGNodW5rcyB3aXRoaW4gdGhlIGRvY3VtZW50LiBZb3UgY2FuIGVtYmVkIGFuIFIgY29kZSBjaHVuayBsaWtlIHRoaXM6CgpgYGB7ciBjYXJzfQpzdW1tYXJ5KGNhcnMpCmBgYAoKIyMgSW5jbHVkaW5nIFBsb3RzCgpZb3UgY2FuIGFsc28gZW1iZWQgcGxvdHMsIGZvciBleGFtcGxlOgoKYGBge3IgcHJlc3N1cmUsIGVjaG89RkFMU0V9CnBsb3QocHJlc3N1cmUpCmBgYAoKTm90ZSB0aGF0IHRoZSBgZWNobyA9IEZBTFNFYCBwYXJhbWV0ZXIgd2FzIGFkZGVkIHRvIHRoZSBjb2RlIGNodW5rIHRvIHByZXZlbnQgcHJpbnRpbmcgb2YgdGhlIFIgY29kZSB0aGF0IGdlbmVyYXRlZCB0aGUgcGxvdC4KCiMjIDMuMSBBIGZpcnN0IGxvb2sgYXQgdGhlIGRhdGEKCkxvYWQgcGFja2FnZXMKCmBgYHtyfQpsaWJyYXJ5KGlncmFwaCkKbGlicmFyeShoYXZlbikgIyB0byByZWFkIFN0YXRhIGZpbGVzCmxpYnJhcnkocmVzaGFwZTIpCmxpYnJhcnkodGlkeXZlcnNlKQpgYGAKClJlYWQgZGF0YQoKYGBge3J9ClB1cGlsc1dhdmVWIDwtIHJlYWRfZHRhKGZpbGUgPSAiUHVwaWxzV2F2ZVYuZHRhIikKYGBgCgoqKlFVRVNUSU9OKio6IEhhdmUgYSBjbG9zZSBsb29rIGF0IHRoZXNlIHR3byB2YXJpYWJsZXMsIGNvbXBhcmluZyB0aGUgKm5hbWVuciogdmFsdWVzIGZvciBkaWZmZXJlbnQgY2xhc3NlcyAoanVzdCBleWViYWxsaW5nIHRoZSBkYXRhIHNob3VsZCBiZSBzdWZmaWNpZW50KS4gV2hhdCBkbyB5b3Ugbm90aWNlPwoKMi1sZXZlbCBkYXRhPwoKYGBge3J9Cgojc2VsZWN0IG9ubHkgb25lIGNsYXNzCmNsYXNzMTJiIDwtIFB1cGlsc1dhdmVWICU+JSAKICBmaWx0ZXIoc2Nob29sbnIgPT0gIjEyYiIpICAjIGtlZXAgb25seSBvbmUgY2xhc3MKYGBgCgojIyAzLjIgQXNzaWdubWVudAoKMVwuCgpgYGB7cn0KZl9lbGlzdF9mcm9tXzEyYiA8LSBjbGFzczEyYgpmX2VsaXN0X2Zyb21fMTJiIDwtICBzZWxlY3QoZl9lbGlzdF9mcm9tXzEyYiwgbmFtZW5yLCBmcmllbmQxOmZyaWVuZDEyKSAjIGtlZXAgb25seSB0aGUgbmV0d29yayB2YXJpYWJsZXMgKGFuZCBpZCkKZl9lbGlzdF9mcm9tXzEyYiA8LSAgbWVsdChmX2VsaXN0X2Zyb21fMTJiLCBpZC52YXJzID0gIm5hbWVuciIpICMgZnJvbSB0aGUgcmVzaGFwZTIgcGFja2FnZQpmX2VsaXN0X2Zyb21fMTJiCgpmX2VsaXN0X2Zyb21fMTJiIDwtIGZfZWxpc3RfZnJvbV8xMmIlPiUgCiAgZmlsdGVyKCFpcy5uYSh2YWx1ZSkpICU+JSAjIGRyb3AgdGhlIG1pc3NpbmdzCiAgcmVuYW1lKGZyb20gPSJuYW1lbnIiLCB0byA9ICJ2YWx1ZSIsIHNvdXJjZXZhcj0gInZhcmlhYmxlIikgJT4lICNqdXN0IG5pY2UgZm9yIGludGVycHJldGF0aW9uCiAgcmVsb2NhdGUodG8sIC5hZnRlcj1mcm9tKSAjbW92ZSBhcm91bmQgdGhlIGNvbHVtbnMKZl9lbGlzdF9mcm9tXzEyYgoKZl9mcm9tXzEyYiA8LSBncmFwaF9mcm9tX2RhdGFfZnJhbWUoZl9lbGlzdF9mcm9tXzEyYikgI1RoaXMgaXMgYSBwcm9wZXIgaWdyYXBoIGdyYXBoIG9iamVjdApwbG90KGZfZnJvbV8xMmIpCmBgYAoKMlwuCgpgYGB7cn0KaXNfZGlyZWN0ZWQoZl9mcm9tXzEyYikKYGBgCgozXC4KCmBgYHtyfQpub2RlX2F0dHJzIDwtIGNsYXNzMTJiICU+JQogIHNlbGVjdChuYW1lbnIsIHNleCkgJT4lCiAgZGlzdGluY3QoKQoKZl9mcm9tXzEyYiA8LSBncmFwaF9mcm9tX2RhdGFfZnJhbWUoCiAgZCA9IGZfZWxpc3RfZnJvbV8xMmIsCiAgdmVydGljZXMgPSBub2RlX2F0dHJzLAogIGRpcmVjdGVkID0gVFJVRQopCgp2ZXJ0ZXhfYXR0cl9uYW1lcyhmX2Zyb21fMTJiKQp1bmlxdWUoVihmX2Zyb21fMTJiKSRzZXgpCgpwbG90KGZfZnJvbV8xMmIpCmBgYAoKNFwuCgpgYGB7cn0KI0RlbnNpdHkKZWRnZV9kZW5zaXR5KGZfZnJvbV8xMmIpCiMwLjE0CgojTnVtYmVyIG9mIGNvbXBvbmVudHMKY291bnRfY29tcG9uZW50cyhmX2Zyb21fMTJiKQojMQoKI1RoZSBkaWFtZXRlcgpkaWFtZXRlcihmX2Zyb21fMTJiKQojNwoKI1RoZSBhdmVyYWdlIHNob3J0ZXN0IHBhdGggbGVuZ3RoCm1lYW5fZGlzdGFuY2UoZl9mcm9tXzEyYikKIzIuODUzNTk4CgojQ2x1c3RlcmluZyBDb2VmZmljaWVudAp0cmFuc2l0aXZpdHkoZl9mcm9tXzEyYiwgdHlwZT0iYXZlcmFnZSIpCiMwLjU4ODY5ODQKYGBgCgo1XC4KCmBgYHtyfQpkZWcgPC0gZGVncmVlKGZfZnJvbV8xMmIpCnNleCA8LSBWKGZfZnJvbV8xMmIpJHNleAoKZGVnX2dpcmxzIDwtIGRlZ1tzZXggPT0gMV0KZGVnX2JveXMgIDwtIGRlZ1tzZXggPT0gMl0KCm1lYW4oZGVnX2dpcmxzKQptZWFuKGRlZ19ib3lzKQoKdC50ZXN0KGRlZ19naXJscywgZGVnX2JveXMsIGFsdGVybmF0aXZlID0gImdyZWF0ZXIiKQoKI0FsdGhvdWdoIGdpcmxzIGhhdmUgYSBzbGlnaHRseSBoaWdoZXIgbWVhbiBkZWdyZWUgKDcuMjkpIHRoYW4gYm95cyAoNi40NCksIHRoZSBkaWZmZXJlbmNlIGlzIG5vdCBzdGF0aXN0aWNhbGx5IHNpZ25pZmljYW50IChXZWxjaCB0LXRlc3QsIHQgPSAwLjYxLCBkZiA9IDE2LjkzLCBwID0gMC4yNzYpLiBUaGVyZWZvcmUsIHdlIGZhaWwgdG8gcmVqZWN0IHRoZSBudWxsIGh5cG90aGVzaXMgdGhhdCBnaXJscyBoYXZlIGhpZ2hlciBkZWdyZWUgdGhhbiBib3lzIGluIHRoaXMgbmV0d29yay4KYGBgCgo2XC4KCmBgYHtyfQpkZWcgPC0gZGVncmVlKGZfZnJvbV8xMmIpCnNleCA8LSBWKGZfZnJvbV8xMmIpJHNleAoKdmVydGV4X2NvbG9ycyA8LSBpZmVsc2Uoc2V4ID09IDEsICJvcmFuZ2UiLCAiZGFya2dyZWVuIikKCnBsb3QoZl9mcm9tXzEyYiwKICAgICB2ZXJ0ZXguc2l6ZSA9IGRlZywKICAgICB2ZXJ0ZXguY29sb3IgPSB2ZXJ0ZXhfY29sb3JzLAogICAgIHZlcnRleC5sYWJlbCA9IE5BLAogICAgIG1haW4gPSAiRnJpZW5kc2hpcCBOZXR3b3JrIikKCmxlZ2VuZCgiYm90dG9tbGVmdCIsIAogICAgICAgbGVnZW5kID0gYygiR2lybHMiLCAiQm95cyIpLCAKICAgICAgIGZpbGwgPSBjKCJvcmFuZ2UiLCAiZGFya2dyZWVuIikpCgoKIyBhIGJldHRlci1sb29raW5nIGdyYXBoIGFkdmlzZWQgYnkgQUkKcGxvdChmX2Zyb21fMTJiLAogICAgIHZlcnRleC5zaXplID0gZGVnICogMC44LAogICAgIHZlcnRleC5jb2xvciA9IHZlcnRleF9jb2xvcnMsCiAgICAgdmVydGV4LmxhYmVsID0gTkEsCiAgICAgdmVydGV4LmZyYW1lLmNvbG9yID0gIndoaXRlIiwKICAgICBlZGdlLmFycm93LnNpemUgPSAwLjIsCiAgICAgZWRnZS5jb2xvciA9ICJncmF5ODAiLAogICAgIGVkZ2UuY3VydmVkID0gMC4yLAogICAgIGxheW91dCA9IGxheW91dF93aXRoX2ZyLAogICAgIG1haW4gPSAiRnJpZW5kc2hpcCBOZXR3b3JrIikKCmxlZ2VuZCgiYm90dG9tbGVmdCIsCiAgICAgICBsZWdlbmQgPSBjKCJHaXJscyIsICJCb3lzIiksCiAgICAgICBmaWxsID0gYygib3JhbmdlIiwgImRhcmtncmVlbiIpLAogICAgICAgYm9yZGVyID0gTkEsCiAgICAgICBidHkgPSAibiIpICAgIApgYGAK</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Tutorial3_Knecht data.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

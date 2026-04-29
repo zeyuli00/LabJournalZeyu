@@ -1,0 +1,182 @@
+---
+title: "Tutorial3_Knecht data"
+author: "Zeyu(Zey)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## 3.1 A first look at the data
+
+Load packages
+
+```{r}
+library(igraph)
+library(haven) # to read Stata files
+library(reshape2)
+library(tidyverse)
+```
+
+Read data
+
+```{r}
+PupilsWaveV <- read_dta(file = "PupilsWaveV.dta")
+```
+
+**QUESTION**: Have a close look at these two variables, comparing the *namenr* values for different classes (just eyeballing the data should be sufficient). What do you notice?
+
+2-level data?
+
+```{r}
+
+#select only one class
+class12b <- PupilsWaveV %>% 
+  filter(schoolnr == "12b")  # keep only one class
+```
+
+## 3.2 Assignment
+
+1\.
+
+```{r}
+f_elist_from_12b <- class12b
+f_elist_from_12b <-  select(f_elist_from_12b, namenr, friend1:friend12) # keep only the network variables (and id)
+f_elist_from_12b <-  melt(f_elist_from_12b, id.vars = "namenr") # from the reshape2 package
+f_elist_from_12b
+
+f_elist_from_12b <- f_elist_from_12b%>% 
+  filter(!is.na(value)) %>% # drop the missings
+  rename(from ="namenr", to = "value", sourcevar= "variable") %>% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+f_elist_from_12b
+
+f_from_12b <- graph_from_data_frame(f_elist_from_12b) #This is a proper igraph graph object
+plot(f_from_12b)
+```
+
+2\.
+
+```{r}
+is_directed(f_from_12b)
+```
+
+3\.
+
+```{r}
+node_attrs <- class12b %>%
+  select(namenr, sex) %>%
+  distinct()
+
+f_from_12b <- graph_from_data_frame(
+  d = f_elist_from_12b,
+  vertices = node_attrs,
+  directed = TRUE
+)
+
+vertex_attr_names(f_from_12b)
+unique(V(f_from_12b)$sex)
+
+plot(f_from_12b)
+```
+
+4\.
+
+```{r}
+#Density
+edge_density(f_from_12b)
+#0.14
+
+#Number of components
+count_components(f_from_12b)
+#1
+
+#The diameter
+diameter(f_from_12b)
+#7
+
+#The average shortest path length
+mean_distance(f_from_12b)
+#2.853598
+
+#Clustering Coefficient
+transitivity(f_from_12b, type="average")
+#0.5886984
+```
+
+5\.
+
+```{r}
+deg <- degree(f_from_12b)
+sex <- V(f_from_12b)$sex
+
+deg_girls <- deg[sex == 1]
+deg_boys  <- deg[sex == 2]
+
+mean(deg_girls)
+mean(deg_boys)
+
+t.test(deg_girls, deg_boys, alternative = "greater")
+
+#Although girls have a slightly higher mean degree (7.29) than boys (6.44), the difference is not statistically significant (Welch t-test, t = 0.61, df = 16.93, p = 0.276). Therefore, we fail to reject the null hypothesis that girls have higher degree than boys in this network.
+```
+
+6\.
+
+```{r}
+deg <- degree(f_from_12b)
+sex <- V(f_from_12b)$sex
+
+vertex_colors <- ifelse(sex == 1, "orange", "darkgreen")
+
+plot(f_from_12b,
+     vertex.size = deg,
+     vertex.color = vertex_colors,
+     vertex.label = NA,
+     main = "Friendship Network")
+
+legend("bottomleft", 
+       legend = c("Girls", "Boys"), 
+       fill = c("orange", "darkgreen"))
+
+
+# a better-looking graph advised by AI
+plot(f_from_12b,
+     vertex.size = deg * 0.8,
+     vertex.color = vertex_colors,
+     vertex.label = NA,
+     vertex.frame.color = "white",
+     edge.arrow.size = 0.2,
+     edge.color = "gray80",
+     edge.curved = 0.2,
+     layout = layout_with_fr,
+     main = "Friendship Network")
+
+legend("bottomleft",
+       legend = c("Girls", "Boys"),
+       fill = c("orange", "darkgreen"),
+       border = NA,
+       bty = "n")    
+```
