@@ -1,0 +1,247 @@
+---
+title: "data handling"
+author: "Zeyu(Zey)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Preparation
+
+```{r}
+library(network)
+library(igraph)
+library(reshape2)
+library(tidyverse)
+```
+
+How to deal with the conflict?
+
+## 1.1 Getting network data into R: the igraph package
+
+### 1.1.1 From adjacency matrix to igraph object
+
+```{r}
+#Read data
+url1 <- "https://github.com/rensec/sasr08/raw/main/g_adj_matrix_simple.csv"
+g_matrix <- read.csv(file = url1, header = FALSE)
+g_matrix
+
+#Check whether this is a matrix or data frame
+class(g_matrix)
+
+#Turn this into a matrix object
+g_matrix <- as.matrix(g_matrix)
+g_matrix
+
+#Add row- and column names
+rownames(g_matrix) <- 1:nrow(g_matrix)
+colnames(g_matrix) <- 1:ncol(g_matrix)
+g_matrix
+```
+
+QUESTION: How many nodes are included in this matrix, #and how many edges are there between these nodes?
+
+5 nodes, 4 edges
+
+```{r}
+#reading attributes of the nodes
+g_nodes_age <- read.csv(file = "https://github.com/rensec/sasr08/raw/main/g_nodes_age.csv")
+g_nodes_age
+
+
+#transfer into an igraph shape
+g <- graph_from_adjacency_matrix(g_matrix)
+class(g)
+g
+
+plot(g)
+
+#isolated node missing
+g <- set_vertex_attr(g, 
+                     name = "age",
+                     value = g_nodes_age$age)
+
+```
+
+### 1.1.2 From edge list to igraph object
+
+```{r}
+#From edge list to igraph object
+g_elist <- read.csv(file = "https://github.com/rensec/sasr08/raw/main/g_elist.csv")
+g_elist
+
+#create an igraph network object from the edge list
+g_from_elist <- graph_from_data_frame(g_elist) 
+plot(g_from_elist)
+
+#and the isolated node lost, so:
+g_from_elist <- graph_from_data_frame(g_elist, vertices = g_nodes_age) 
+plot(g_from_elist)
+```
+
+### 1.1.3 From adjacency list to igraph object
+
+```{r}
+#From adjacency list to igraph object
+
+g_adj_list <- read.csv(file = "https://github.com/rensec/sasr08/raw/main/g_adj_list.csv")
+g_adj_list
+
+#transfer the data to something igraph can understand
+g_elist_from_alist <- g_adj_list
+g_elist_from_alist <-  select(g_elist_from_alist, id, friend1:friend2) # keep only the network variables (and id)
+g_elist_from_alist <-  melt(g_elist_from_alist, id.vars = "id") # from the reshape2 package
+g_elist_from_alist
+
+#make code shorter using tidyverse
+g_elist_from_alist <- g_adj_list %>% 
+  select(id, friend1:friend2) %>% # keep only the network variables (and id)
+  melt( id.vars = "id") # from the reshape2 package
+
+#To create an edge list we subsequently drop all missing values on “value”
+g_elist_from_alist <- g_elist_from_alist%>% 
+  filter(!is.na(value)) %>% # drop the missings
+  rename(from ="id", to = "value", sourcevar= "variable") %>% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+g_elist_from_alist
+
+g_from_alist <- graph_from_data_frame(g_elist_from_alist) #This is a proper igraph graph object
+plot(g_from_alist)
+
+nodelist <- select(g_adj_list,id,age)
+g_from_alist <- graph_from_data_frame(g_elist_from_alist, vertices = nodelist) #This is a proper igraph graph object
+plot(g_from_alist)
+
+```
+
+## 1.2 The reverse direction: exporting from igraph objects
+
+### 1.2.1 From igraph to adjacency matrix
+
+```{r}
+g_adj_matrix <- as_adjacency_matrix(g, sparse = FALSE)
+g_adj_matrix
+
+#check whether the resulting matrix is indeed identical
+all(g_adj_matrix == g_matrix)
+```
+
+### 1.2.2 From igraph to edge list
+
+```{r}
+g_edgelist <- igraph::as_data_frame(g_from_elist, what = "edges") 
+g_edgelist 
+
+#add missing nodes
+igraph::as_data_frame(g_from_elist, what = "vertices") 
+```
+
+### 1.2.3 From igraph to adjacency list
+
+```{r}
+edgelist_2 <- igraph::as_data_frame(g_from_alist, what = "edges")
+nodelist_2 <- igraph::as_data_frame(g_from_alist, what = "vertices")
+# Note the use of the "namespace" "igraph::" here, to indicate that we need the igraph function here, not the function with the same name from the dplyr/tidyverse package
+
+d <- edgelist_2 %>%
+  rename(id = "from") %>% 
+  pivot_wider( id_cols = id, names_from = sourcevar, values_from = to ) %>% 
+  merge(nodelist_2, by.x = "id", by.y = "name", all.y = TRUE ) %>% 
+  relocate(age, .after = id) %>% 
+  type_convert() #as_data_frame returns characters; this transforms it back to numeric
+
+d
+```
+
+## 1.3 Getting network data into R: the network package
+
+```{r}
+#import data into a network object (using the edge list that we’ve created before)
+
+g_np <- as.network(g_elist_from_alist, matrix.type = "edgelist", vertices = nodelist)
+g_np
+
+plot(g_np)
+
+```
+
+## 1.4 Modifying networks in igraph
+
+Remove a node
+
+```{r}
+g_mod <- delete_vertices(g,2)
+plot(g_mod)
+```
+
+Remove all nodes with age = 21
+
+```{r}
+g_mod <- delete_vertices(g,which(V(g)$age == 21))
+plot(g_mod)
+```
+
+**QUESTION:**: Write the code to remove all nodes from `g` for which age is missing.
+
+```{r}
+g_mod <- delete_vertices(g, which(is.na(V(g)$age)))
+plot(g_mod)
+```
+
+An alternative to `set_vertex_attr()` to set attributes using V( )
+
+```{r}
+V(g)$gender <- c("male", "female", "female", "other", "male") 
+g
+```
+
+Similarly, we can use `E()` to access, add and modify edge attributes.
+
+Use `reverse()` to reverse the direction of all edges
+
+```{r}
+g_rev <- reverse_edges(g)
+plot(g_rev)
+```
+
+use `union()` to combine the edges of two graphs
+
+```{r}
+g_union <- igraph::union(g, g_rev)
+plot(g_union)
+```
+
+***QUESTION***: Before you run `plot(g_union)`, think about what the resulting network should look like. Thus, what could you use the combination of `reverse()` and `union()` for?
+
+Transfer directional network into indirectional one
+
+A similar result can be done as:
+
+```{r}
+g_undir <- as_undirected(g)
+plot(g_undir)
+```

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zeyu(Zey)" />
+
+<meta name="date" content="2026-04-29" />
+
+<title>data handling</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    My journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="lab1.html">Page 1</a>
+    </li>
+    <li>
+      <a href="test_rmd.html">Page 2</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/robfranken/LabJournal">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">data handling</h1>
+<h4 class="author">Zeyu(Zey)</h4>
+<h4 class="date">2026-04-29</h4>
+
+</div>
+
+
+<div id="r-markdown" class="section level2" number="1">
+<h2><span class="header-section-number">1</span> R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting
+syntax for authoring HTML, PDF, and MS Word documents. For more details
+on using R Markdown see <a href="http://rmarkdown.rstudio.com"
+class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be
+generated that includes both content as well as the output of any
+embedded R code chunks within the document. You can embed an R code
+chunk like this:</p>
+<pre class="r"><code>summary(cars)</code></pre>
+<pre><code>##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00</code></pre>
+</div>
+<div id="including-plots" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="Tutorial1_data-handling_files/figure-html/pressure-1.png" alt="" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the
+code chunk to prevent printing of the R code that generated the
+plot.</p>
+</div>
+<div id="preparation" class="section level2" number="3">
+<h2><span class="header-section-number">3</span> Preparation</h2>
+<pre class="r"><code>library(network)</code></pre>
+<pre><code>## 
+## &#39;network&#39; 1.20.0 (2026-02-06), part of the Statnet Project
+## * &#39;news(package=&quot;network&quot;)&#39; for changes since last version
+## * &#39;citation(&quot;network&quot;)&#39; for citation information
+## * &#39;https://statnet.org&#39; for help, support, and other information</code></pre>
+<pre class="r"><code>library(igraph)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:network&#39;:
+## 
+##     %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices,
+##     get.edge.attribute, get.edges, get.vertex.attribute, is.bipartite,
+##     is.directed, list.edge.attributes, list.vertex.attributes,
+##     set.edge.attribute, set.vertex.attribute</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     decompose, spectrum</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     union</code></pre>
+<pre class="r"><code>library(reshape2)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.0     ✔ readr     2.1.6
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.2     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ lubridate::%--%()      masks igraph::%--%()
+## ✖ dplyr::as_data_frame() masks tibble::as_data_frame(), igraph::as_data_frame()
+## ✖ purrr::compose()       masks igraph::compose()
+## ✖ tidyr::crossing()      masks igraph::crossing()
+## ✖ dplyr::filter()        masks stats::filter()
+## ✖ dplyr::lag()           masks stats::lag()
+## ✖ purrr::simplify()      masks igraph::simplify()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<p>How to deal with the conflict?</p>
+</div>
+<div id="getting-network-data-into-r-the-igraph-package"
+class="section level2" number="4">
+<h2><span class="header-section-number">4</span> 1.1 Getting network
+data into R: the igraph package</h2>
+<div id="from-adjacency-matrix-to-igraph-object" class="section level3"
+number="4.1">
+<h3><span class="header-section-number">4.1</span> 1.1.1 From adjacency
+matrix to igraph object</h3>
+<pre class="r"><code>#Read data
+url1 &lt;- &quot;https://github.com/rensec/sasr08/raw/main/g_adj_matrix_simple.csv&quot;
+g_matrix &lt;- read.csv(file = url1, header = FALSE)
+g_matrix</code></pre>
+<pre><code>##   V1 V2 V3 V4 V5
+## 1  0  1  0  1  0
+## 2  0  0  1  0  0
+## 3  1  0  0  0  0
+## 4  0  0  0  0  0
+## 5  0  0  0  0  0</code></pre>
+<pre class="r"><code>#Check whether this is a matrix or data frame
+class(g_matrix)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>#Turn this into a matrix object
+g_matrix &lt;- as.matrix(g_matrix)
+g_matrix</code></pre>
+<pre><code>##      V1 V2 V3 V4 V5
+## [1,]  0  1  0  1  0
+## [2,]  0  0  1  0  0
+## [3,]  1  0  0  0  0
+## [4,]  0  0  0  0  0
+## [5,]  0  0  0  0  0</code></pre>
+<pre class="r"><code>#Add row- and column names
+rownames(g_matrix) &lt;- 1:nrow(g_matrix)
+colnames(g_matrix) &lt;- 1:ncol(g_matrix)
+g_matrix</code></pre>
+<pre><code>##   1 2 3 4 5
+## 1 0 1 0 1 0
+## 2 0 0 1 0 0
+## 3 1 0 0 0 0
+## 4 0 0 0 0 0
+## 5 0 0 0 0 0</code></pre>
+<p>QUESTION: How many nodes are included in this matrix, #and how many
+edges are there between these nodes?</p>
+<p>5 nodes, 4 edges</p>
+<pre class="r"><code>#reading attributes of the nodes
+g_nodes_age &lt;- read.csv(file = &quot;https://github.com/rensec/sasr08/raw/main/g_nodes_age.csv&quot;)
+g_nodes_age</code></pre>
+<pre><code>##   id age
+## 1  1  20
+## 2  2  21
+## 3  3  25
+## 4  4  NA
+## 5  5  21</code></pre>
+<pre class="r"><code>#transfer into an igraph shape
+g &lt;- graph_from_adjacency_matrix(g_matrix)
+class(g)</code></pre>
+<pre><code>## [1] &quot;igraph&quot;</code></pre>
+<pre class="r"><code>g</code></pre>
+<pre><code>## IGRAPH caa8fe8 DN-- 5 4 -- 
+## + attr: name (v/c)
+## + edges from caa8fe8 (vertex names):
+## [1] 1-&gt;2 1-&gt;4 2-&gt;3 3-&gt;1</code></pre>
+<pre class="r"><code>plot(g)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /></p>
+<pre class="r"><code>#isolated node missing
+g &lt;- set_vertex_attr(g, 
+                     name = &quot;age&quot;,
+                     value = g_nodes_age$age)</code></pre>
+</div>
+<div id="from-edge-list-to-igraph-object" class="section level3"
+number="4.2">
+<h3><span class="header-section-number">4.2</span> 1.1.2 From edge list
+to igraph object</h3>
+<pre class="r"><code>#From edge list to igraph object
+g_elist &lt;- read.csv(file = &quot;https://github.com/rensec/sasr08/raw/main/g_elist.csv&quot;)
+g_elist</code></pre>
+<pre><code>##   from to
+## 1    1  2
+## 2    2  3
+## 3    3  1
+## 4    1  4</code></pre>
+<pre class="r"><code>#create an igraph network object from the edge list
+g_from_elist &lt;- graph_from_data_frame(g_elist) 
+plot(g_from_elist)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
+<pre class="r"><code>#and the isolated node lost, so:
+g_from_elist &lt;- graph_from_data_frame(g_elist, vertices = g_nodes_age) 
+plot(g_from_elist)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-4-2.png" alt="" width="672" /></p>
+</div>
+<div id="from-adjacency-list-to-igraph-object" class="section level3"
+number="4.3">
+<h3><span class="header-section-number">4.3</span> 1.1.3 From adjacency
+list to igraph object</h3>
+<pre class="r"><code>#From adjacency list to igraph object
+
+g_adj_list &lt;- read.csv(file = &quot;https://github.com/rensec/sasr08/raw/main/g_adj_list.csv&quot;)
+g_adj_list</code></pre>
+<pre><code>##   id age friend1 friend2
+## 1  1  20       2       4
+## 2  2  21       3      NA
+## 3  3  25       1      NA
+## 4  4  NA      NA      NA
+## 5  5  21      NA      NA</code></pre>
+<pre class="r"><code>#transfer the data to something igraph can understand
+g_elist_from_alist &lt;- g_adj_list
+g_elist_from_alist &lt;-  select(g_elist_from_alist, id, friend1:friend2) # keep only the network variables (and id)
+g_elist_from_alist &lt;-  melt(g_elist_from_alist, id.vars = &quot;id&quot;) # from the reshape2 package
+g_elist_from_alist</code></pre>
+<pre><code>##    id variable value
+## 1   1  friend1     2
+## 2   2  friend1     3
+## 3   3  friend1     1
+## 4   4  friend1    NA
+## 5   5  friend1    NA
+## 6   1  friend2     4
+## 7   2  friend2    NA
+## 8   3  friend2    NA
+## 9   4  friend2    NA
+## 10  5  friend2    NA</code></pre>
+<pre class="r"><code>#make code shorter using tidyverse
+g_elist_from_alist &lt;- g_adj_list %&gt;% 
+  select(id, friend1:friend2) %&gt;% # keep only the network variables (and id)
+  melt( id.vars = &quot;id&quot;) # from the reshape2 package
+
+#To create an edge list we subsequently drop all missing values on “value”
+g_elist_from_alist &lt;- g_elist_from_alist%&gt;% 
+  filter(!is.na(value)) %&gt;% # drop the missings
+  rename(from =&quot;id&quot;, to = &quot;value&quot;, sourcevar= &quot;variable&quot;) %&gt;% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+g_elist_from_alist</code></pre>
+<pre><code>##   from to sourcevar
+## 1    1  2   friend1
+## 2    2  3   friend1
+## 3    3  1   friend1
+## 4    1  4   friend2</code></pre>
+<pre class="r"><code>g_from_alist &lt;- graph_from_data_frame(g_elist_from_alist) #This is a proper igraph graph object
+plot(g_from_alist)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-5-1.png" alt="" width="672" /></p>
+<pre class="r"><code>nodelist &lt;- select(g_adj_list,id,age)
+g_from_alist &lt;- graph_from_data_frame(g_elist_from_alist, vertices = nodelist) #This is a proper igraph graph object
+plot(g_from_alist)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-5-2.png" alt="" width="672" /></p>
+</div>
+</div>
+<div id="the-reverse-direction-exporting-from-igraph-objects"
+class="section level2" number="5">
+<h2><span class="header-section-number">5</span> 1.2 The reverse
+direction: exporting from igraph objects</h2>
+<div id="from-igraph-to-adjacency-matrix" class="section level3"
+number="5.1">
+<h3><span class="header-section-number">5.1</span> 1.2.1 From igraph to
+adjacency matrix</h3>
+<pre class="r"><code>g_adj_matrix &lt;- as_adjacency_matrix(g, sparse = FALSE)
+g_adj_matrix</code></pre>
+<pre><code>##   1 2 3 4 5
+## 1 0 1 0 1 0
+## 2 0 0 1 0 0
+## 3 1 0 0 0 0
+## 4 0 0 0 0 0
+## 5 0 0 0 0 0</code></pre>
+<pre class="r"><code>#check whether the resulting matrix is indeed identical
+all(g_adj_matrix == g_matrix)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="from-igraph-to-edge-list" class="section level3" number="5.2">
+<h3><span class="header-section-number">5.2</span> 1.2.2 From igraph to
+edge list</h3>
+<pre class="r"><code>g_edgelist &lt;- igraph::as_data_frame(g_from_elist, what = &quot;edges&quot;) 
+g_edgelist </code></pre>
+<pre><code>##   from to
+## 1    1  2
+## 2    2  3
+## 3    3  1
+## 4    1  4</code></pre>
+<pre class="r"><code>#add missing nodes
+igraph::as_data_frame(g_from_elist, what = &quot;vertices&quot;) </code></pre>
+<pre><code>##   name age
+## 1    1  20
+## 2    2  21
+## 3    3  25
+## 4    4  NA
+## 5    5  21</code></pre>
+</div>
+<div id="from-igraph-to-adjacency-list" class="section level3"
+number="5.3">
+<h3><span class="header-section-number">5.3</span> 1.2.3 From igraph to
+adjacency list</h3>
+<pre class="r"><code>edgelist_2 &lt;- igraph::as_data_frame(g_from_alist, what = &quot;edges&quot;)
+nodelist_2 &lt;- igraph::as_data_frame(g_from_alist, what = &quot;vertices&quot;)
+# Note the use of the &quot;namespace&quot; &quot;igraph::&quot; here, to indicate that we need the igraph function here, not the function with the same name from the dplyr/tidyverse package
+
+d &lt;- edgelist_2 %&gt;%
+  rename(id = &quot;from&quot;) %&gt;% 
+  pivot_wider( id_cols = id, names_from = sourcevar, values_from = to ) %&gt;% 
+  merge(nodelist_2, by.x = &quot;id&quot;, by.y = &quot;name&quot;, all.y = TRUE ) %&gt;% 
+  relocate(age, .after = id) %&gt;% 
+  type_convert() #as_data_frame returns characters; this transforms it back to numeric</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   id = col_double(),
+##   friend1 = col_double(),
+##   friend2 = col_double()
+## )</code></pre>
+<pre class="r"><code>d</code></pre>
+<pre><code>##   id age friend1 friend2
+## 1  1  20       2       4
+## 2  2  21       3      NA
+## 3  3  25       1      NA
+## 4  4  NA      NA      NA
+## 5  5  21      NA      NA</code></pre>
+</div>
+</div>
+<div id="getting-network-data-into-r-the-network-package"
+class="section level2" number="6">
+<h2><span class="header-section-number">6</span> 1.3 Getting network
+data into R: the network package</h2>
+<pre class="r"><code>#import data into a network object (using the edge list that we’ve created before)
+
+g_np &lt;- as.network(g_elist_from_alist, matrix.type = &quot;edgelist&quot;, vertices = nodelist)
+g_np</code></pre>
+<pre><code>##  Network attributes:
+##   vertices = 5 
+##   directed = TRUE 
+##   hyper = FALSE 
+##   loops = FALSE 
+##   multiple = FALSE 
+##   bipartite = FALSE 
+##   total edges= 4 
+##     missing edges= 0 
+##     non-missing edges= 4 
+## 
+##  Vertex attribute names: 
+##     age vertex.names 
+## 
+##  Edge attribute names: 
+##     sourcevar</code></pre>
+<pre class="r"><code>plot(g_np)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" /></p>
+</div>
+<div id="modifying-networks-in-igraph" class="section level2"
+number="7">
+<h2><span class="header-section-number">7</span> 1.4 Modifying networks
+in igraph</h2>
+<p>Remove a node</p>
+<pre class="r"><code>g_mod &lt;- delete_vertices(g,2)
+plot(g_mod)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-10-1.png" alt="" width="672" /></p>
+<p>Remove all nodes with age = 21</p>
+<pre class="r"><code>g_mod &lt;- delete_vertices(g,which(V(g)$age == 21))
+plot(g_mod)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-11-1.png" alt="" width="672" /></p>
+<p><strong>QUESTION:</strong>: Write the code to remove all nodes from
+<code>g</code> for which age is missing.</p>
+<pre class="r"><code>g_mod &lt;- delete_vertices(g, which(is.na(V(g)$age)))
+plot(g_mod)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-12-1.png" alt="" width="672" /></p>
+<p>An alternative to <code>set_vertex_attr()</code> to set attributes
+using V( )</p>
+<pre class="r"><code>V(g)$gender &lt;- c(&quot;male&quot;, &quot;female&quot;, &quot;female&quot;, &quot;other&quot;, &quot;male&quot;) 
+g</code></pre>
+<pre><code>## IGRAPH caa8fe8 DN-- 5 4 -- 
+## + attr: name (v/c), age (v/n), gender (v/c)
+## + edges from caa8fe8 (vertex names):
+## [1] 1-&gt;2 1-&gt;4 2-&gt;3 3-&gt;1</code></pre>
+<p>Similarly, we can use <code>E()</code> to access, add and modify edge
+attributes.</p>
+<p>Use <code>reverse()</code> to reverse the direction of all edges</p>
+<pre class="r"><code>g_rev &lt;- reverse_edges(g)
+plot(g_rev)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-14-1.png" alt="" width="672" /></p>
+<p>use <code>union()</code> to combine the edges of two graphs</p>
+<pre class="r"><code>g_union &lt;- igraph::union(g, g_rev)
+plot(g_union)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-15-1.png" alt="" width="672" /></p>
+<p><strong><em>QUESTION</em></strong>: Before you run
+<code>plot(g_union)</code>, think about what the resulting network
+should look like. Thus, what could you use the combination of
+<code>reverse()</code> and <code>union()</code> for?</p>
+<p>Transfer directional network into indirectional one</p>
+<p>A similar result can be done as:</p>
+<pre class="r"><code>g_undir &lt;- as_undirected(g)
+plot(g_undir)</code></pre>
+<p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-16-1.png" alt="" width="672" /></p>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiZGF0YSBoYW5kbGluZyIKYXV0aG9yOiAiWmV5dShaZXkpIgpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiCm91dHB1dDogaHRtbF9kb2N1bWVudAotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpCmBgYAoKIyMgUiBNYXJrZG93bgoKVGhpcyBpcyBhbiBSIE1hcmtkb3duIGRvY3VtZW50LiBNYXJrZG93biBpcyBhIHNpbXBsZSBmb3JtYXR0aW5nIHN5bnRheCBmb3IgYXV0aG9yaW5nIEhUTUwsIFBERiwgYW5kIE1TIFdvcmQgZG9jdW1lbnRzLiBGb3IgbW9yZSBkZXRhaWxzIG9uIHVzaW5nIFIgTWFya2Rvd24gc2VlIDxodHRwOi8vcm1hcmtkb3duLnJzdHVkaW8uY29tPi4KCldoZW4geW91IGNsaWNrIHRoZSAqKktuaXQqKiBidXR0b24gYSBkb2N1bWVudCB3aWxsIGJlIGdlbmVyYXRlZCB0aGF0IGluY2x1ZGVzIGJvdGggY29udGVudCBhcyB3ZWxsIGFzIHRoZSBvdXRwdXQgb2YgYW55IGVtYmVkZGVkIFIgY29kZSBjaHVua3Mgd2l0aGluIHRoZSBkb2N1bWVudC4gWW91IGNhbiBlbWJlZCBhbiBSIGNvZGUgY2h1bmsgbGlrZSB0aGlzOgoKYGBge3IgY2Fyc30Kc3VtbWFyeShjYXJzKQpgYGAKCiMjIEluY2x1ZGluZyBQbG90cwoKWW91IGNhbiBhbHNvIGVtYmVkIHBsb3RzLCBmb3IgZXhhbXBsZToKCmBgYHtyIHByZXNzdXJlLCBlY2hvPUZBTFNFfQpwbG90KHByZXNzdXJlKQpgYGAKCk5vdGUgdGhhdCB0aGUgYGVjaG8gPSBGQUxTRWAgcGFyYW1ldGVyIHdhcyBhZGRlZCB0byB0aGUgY29kZSBjaHVuayB0byBwcmV2ZW50IHByaW50aW5nIG9mIHRoZSBSIGNvZGUgdGhhdCBnZW5lcmF0ZWQgdGhlIHBsb3QuCgojIyBQcmVwYXJhdGlvbgoKYGBge3J9CmxpYnJhcnkobmV0d29yaykKbGlicmFyeShpZ3JhcGgpCmxpYnJhcnkocmVzaGFwZTIpCmxpYnJhcnkodGlkeXZlcnNlKQpgYGAKCkhvdyB0byBkZWFsIHdpdGggdGhlIGNvbmZsaWN0PwoKIyMgMS4xIEdldHRpbmcgbmV0d29yayBkYXRhIGludG8gUjogdGhlIGlncmFwaCBwYWNrYWdlCgojIyMgMS4xLjEgRnJvbSBhZGphY2VuY3kgbWF0cml4IHRvIGlncmFwaCBvYmplY3QKCmBgYHtyfQojUmVhZCBkYXRhCnVybDEgPC0gImh0dHBzOi8vZ2l0aHViLmNvbS9yZW5zZWMvc2FzcjA4L3Jhdy9tYWluL2dfYWRqX21hdHJpeF9zaW1wbGUuY3N2IgpnX21hdHJpeCA8LSByZWFkLmNzdihmaWxlID0gdXJsMSwgaGVhZGVyID0gRkFMU0UpCmdfbWF0cml4CgojQ2hlY2sgd2hldGhlciB0aGlzIGlzIGEgbWF0cml4IG9yIGRhdGEgZnJhbWUKY2xhc3MoZ19tYXRyaXgpCgojVHVybiB0aGlzIGludG8gYSBtYXRyaXggb2JqZWN0CmdfbWF0cml4IDwtIGFzLm1hdHJpeChnX21hdHJpeCkKZ19tYXRyaXgKCiNBZGQgcm93LSBhbmQgY29sdW1uIG5hbWVzCnJvd25hbWVzKGdfbWF0cml4KSA8LSAxOm5yb3coZ19tYXRyaXgpCmNvbG5hbWVzKGdfbWF0cml4KSA8LSAxOm5jb2woZ19tYXRyaXgpCmdfbWF0cml4CmBgYAoKUVVFU1RJT046IEhvdyBtYW55IG5vZGVzIGFyZSBpbmNsdWRlZCBpbiB0aGlzIG1hdHJpeCwgI2FuZCBob3cgbWFueSBlZGdlcyBhcmUgdGhlcmUgYmV0d2VlbiB0aGVzZSBub2Rlcz8KCjUgbm9kZXMsIDQgZWRnZXMKCmBgYHtyfQojcmVhZGluZyBhdHRyaWJ1dGVzIG9mIHRoZSBub2RlcwpnX25vZGVzX2FnZSA8LSByZWFkLmNzdihmaWxlID0gImh0dHBzOi8vZ2l0aHViLmNvbS9yZW5zZWMvc2FzcjA4L3Jhdy9tYWluL2dfbm9kZXNfYWdlLmNzdiIpCmdfbm9kZXNfYWdlCgoKI3RyYW5zZmVyIGludG8gYW4gaWdyYXBoIHNoYXBlCmcgPC0gZ3JhcGhfZnJvbV9hZGphY2VuY3lfbWF0cml4KGdfbWF0cml4KQpjbGFzcyhnKQpnCgpwbG90KGcpCgojaXNvbGF0ZWQgbm9kZSBtaXNzaW5nCmcgPC0gc2V0X3ZlcnRleF9hdHRyKGcsIAogICAgICAgICAgICAgICAgICAgICBuYW1lID0gImFnZSIsCiAgICAgICAgICAgICAgICAgICAgIHZhbHVlID0gZ19ub2Rlc19hZ2UkYWdlKQoKYGBgCgojIyMgMS4xLjIgRnJvbSBlZGdlIGxpc3QgdG8gaWdyYXBoIG9iamVjdAoKYGBge3J9CiNGcm9tIGVkZ2UgbGlzdCB0byBpZ3JhcGggb2JqZWN0CmdfZWxpc3QgPC0gcmVhZC5jc3YoZmlsZSA9ICJodHRwczovL2dpdGh1Yi5jb20vcmVuc2VjL3Nhc3IwOC9yYXcvbWFpbi9nX2VsaXN0LmNzdiIpCmdfZWxpc3QKCiNjcmVhdGUgYW4gaWdyYXBoIG5ldHdvcmsgb2JqZWN0IGZyb20gdGhlIGVkZ2UgbGlzdApnX2Zyb21fZWxpc3QgPC0gZ3JhcGhfZnJvbV9kYXRhX2ZyYW1lKGdfZWxpc3QpIApwbG90KGdfZnJvbV9lbGlzdCkKCiNhbmQgdGhlIGlzb2xhdGVkIG5vZGUgbG9zdCwgc286CmdfZnJvbV9lbGlzdCA8LSBncmFwaF9mcm9tX2RhdGFfZnJhbWUoZ19lbGlzdCwgdmVydGljZXMgPSBnX25vZGVzX2FnZSkgCnBsb3QoZ19mcm9tX2VsaXN0KQpgYGAKCiMjIyAxLjEuMyBGcm9tIGFkamFjZW5jeSBsaXN0IHRvIGlncmFwaCBvYmplY3QKCmBgYHtyfQojRnJvbSBhZGphY2VuY3kgbGlzdCB0byBpZ3JhcGggb2JqZWN0CgpnX2Fkal9saXN0IDwtIHJlYWQuY3N2KGZpbGUgPSAiaHR0cHM6Ly9naXRodWIuY29tL3JlbnNlYy9zYXNyMDgvcmF3L21haW4vZ19hZGpfbGlzdC5jc3YiKQpnX2Fkal9saXN0CgojdHJhbnNmZXIgdGhlIGRhdGEgdG8gc29tZXRoaW5nIGlncmFwaCBjYW4gdW5kZXJzdGFuZApnX2VsaXN0X2Zyb21fYWxpc3QgPC0gZ19hZGpfbGlzdApnX2VsaXN0X2Zyb21fYWxpc3QgPC0gIHNlbGVjdChnX2VsaXN0X2Zyb21fYWxpc3QsIGlkLCBmcmllbmQxOmZyaWVuZDIpICMga2VlcCBvbmx5IHRoZSBuZXR3b3JrIHZhcmlhYmxlcyAoYW5kIGlkKQpnX2VsaXN0X2Zyb21fYWxpc3QgPC0gIG1lbHQoZ19lbGlzdF9mcm9tX2FsaXN0LCBpZC52YXJzID0gImlkIikgIyBmcm9tIHRoZSByZXNoYXBlMiBwYWNrYWdlCmdfZWxpc3RfZnJvbV9hbGlzdAoKI21ha2UgY29kZSBzaG9ydGVyIHVzaW5nIHRpZHl2ZXJzZQpnX2VsaXN0X2Zyb21fYWxpc3QgPC0gZ19hZGpfbGlzdCAlPiUgCiAgc2VsZWN0KGlkLCBmcmllbmQxOmZyaWVuZDIpICU+JSAjIGtlZXAgb25seSB0aGUgbmV0d29yayB2YXJpYWJsZXMgKGFuZCBpZCkKICBtZWx0KCBpZC52YXJzID0gImlkIikgIyBmcm9tIHRoZSByZXNoYXBlMiBwYWNrYWdlCgojVG8gY3JlYXRlIGFuIGVkZ2UgbGlzdCB3ZSBzdWJzZXF1ZW50bHkgZHJvcCBhbGwgbWlzc2luZyB2YWx1ZXMgb24g4oCcdmFsdWXigJ0KZ19lbGlzdF9mcm9tX2FsaXN0IDwtIGdfZWxpc3RfZnJvbV9hbGlzdCU+JSAKICBmaWx0ZXIoIWlzLm5hKHZhbHVlKSkgJT4lICMgZHJvcCB0aGUgbWlzc2luZ3MKICByZW5hbWUoZnJvbSA9ImlkIiwgdG8gPSAidmFsdWUiLCBzb3VyY2V2YXI9ICJ2YXJpYWJsZSIpICU+JSAjanVzdCBuaWNlIGZvciBpbnRlcnByZXRhdGlvbgogIHJlbG9jYXRlKHRvLCAuYWZ0ZXI9ZnJvbSkgI21vdmUgYXJvdW5kIHRoZSBjb2x1bW5zCmdfZWxpc3RfZnJvbV9hbGlzdAoKZ19mcm9tX2FsaXN0IDwtIGdyYXBoX2Zyb21fZGF0YV9mcmFtZShnX2VsaXN0X2Zyb21fYWxpc3QpICNUaGlzIGlzIGEgcHJvcGVyIGlncmFwaCBncmFwaCBvYmplY3QKcGxvdChnX2Zyb21fYWxpc3QpCgpub2RlbGlzdCA8LSBzZWxlY3QoZ19hZGpfbGlzdCxpZCxhZ2UpCmdfZnJvbV9hbGlzdCA8LSBncmFwaF9mcm9tX2RhdGFfZnJhbWUoZ19lbGlzdF9mcm9tX2FsaXN0LCB2ZXJ0aWNlcyA9IG5vZGVsaXN0KSAjVGhpcyBpcyBhIHByb3BlciBpZ3JhcGggZ3JhcGggb2JqZWN0CnBsb3QoZ19mcm9tX2FsaXN0KQoKYGBgCgojIyAxLjIgVGhlIHJldmVyc2UgZGlyZWN0aW9uOiBleHBvcnRpbmcgZnJvbSBpZ3JhcGggb2JqZWN0cwoKIyMjIDEuMi4xIEZyb20gaWdyYXBoIHRvIGFkamFjZW5jeSBtYXRyaXgKCmBgYHtyfQpnX2Fkal9tYXRyaXggPC0gYXNfYWRqYWNlbmN5X21hdHJpeChnLCBzcGFyc2UgPSBGQUxTRSkKZ19hZGpfbWF0cml4CgojY2hlY2sgd2hldGhlciB0aGUgcmVzdWx0aW5nIG1hdHJpeCBpcyBpbmRlZWQgaWRlbnRpY2FsCmFsbChnX2Fkal9tYXRyaXggPT0gZ19tYXRyaXgpCmBgYAoKIyMjIDEuMi4yIEZyb20gaWdyYXBoIHRvIGVkZ2UgbGlzdAoKYGBge3J9CmdfZWRnZWxpc3QgPC0gaWdyYXBoOjphc19kYXRhX2ZyYW1lKGdfZnJvbV9lbGlzdCwgd2hhdCA9ICJlZGdlcyIpIApnX2VkZ2VsaXN0IAoKI2FkZCBtaXNzaW5nIG5vZGVzCmlncmFwaDo6YXNfZGF0YV9mcmFtZShnX2Zyb21fZWxpc3QsIHdoYXQgPSAidmVydGljZXMiKSAKYGBgCgojIyMgMS4yLjMgRnJvbSBpZ3JhcGggdG8gYWRqYWNlbmN5IGxpc3QKCmBgYHtyfQplZGdlbGlzdF8yIDwtIGlncmFwaDo6YXNfZGF0YV9mcmFtZShnX2Zyb21fYWxpc3QsIHdoYXQgPSAiZWRnZXMiKQpub2RlbGlzdF8yIDwtIGlncmFwaDo6YXNfZGF0YV9mcmFtZShnX2Zyb21fYWxpc3QsIHdoYXQgPSAidmVydGljZXMiKQojIE5vdGUgdGhlIHVzZSBvZiB0aGUgIm5hbWVzcGFjZSIgImlncmFwaDo6IiBoZXJlLCB0byBpbmRpY2F0ZSB0aGF0IHdlIG5lZWQgdGhlIGlncmFwaCBmdW5jdGlvbiBoZXJlLCBub3QgdGhlIGZ1bmN0aW9uIHdpdGggdGhlIHNhbWUgbmFtZSBmcm9tIHRoZSBkcGx5ci90aWR5dmVyc2UgcGFja2FnZQoKZCA8LSBlZGdlbGlzdF8yICU+JQogIHJlbmFtZShpZCA9ICJmcm9tIikgJT4lIAogIHBpdm90X3dpZGVyKCBpZF9jb2xzID0gaWQsIG5hbWVzX2Zyb20gPSBzb3VyY2V2YXIsIHZhbHVlc19mcm9tID0gdG8gKSAlPiUgCiAgbWVyZ2Uobm9kZWxpc3RfMiwgYnkueCA9ICJpZCIsIGJ5LnkgPSAibmFtZSIsIGFsbC55ID0gVFJVRSApICU+JSAKICByZWxvY2F0ZShhZ2UsIC5hZnRlciA9IGlkKSAlPiUgCiAgdHlwZV9jb252ZXJ0KCkgI2FzX2RhdGFfZnJhbWUgcmV0dXJucyBjaGFyYWN0ZXJzOyB0aGlzIHRyYW5zZm9ybXMgaXQgYmFjayB0byBudW1lcmljCgpkCmBgYAoKIyMgMS4zIEdldHRpbmcgbmV0d29yayBkYXRhIGludG8gUjogdGhlIG5ldHdvcmsgcGFja2FnZQoKYGBge3J9CiNpbXBvcnQgZGF0YSBpbnRvIGEgbmV0d29yayBvYmplY3QgKHVzaW5nIHRoZSBlZGdlIGxpc3QgdGhhdCB3ZeKAmXZlIGNyZWF0ZWQgYmVmb3JlKQoKZ19ucCA8LSBhcy5uZXR3b3JrKGdfZWxpc3RfZnJvbV9hbGlzdCwgbWF0cml4LnR5cGUgPSAiZWRnZWxpc3QiLCB2ZXJ0aWNlcyA9IG5vZGVsaXN0KQpnX25wCgpwbG90KGdfbnApCgpgYGAKCiMjIDEuNCBNb2RpZnlpbmcgbmV0d29ya3MgaW4gaWdyYXBoCgpSZW1vdmUgYSBub2RlCgpgYGB7cn0KZ19tb2QgPC0gZGVsZXRlX3ZlcnRpY2VzKGcsMikKcGxvdChnX21vZCkKYGBgCgpSZW1vdmUgYWxsIG5vZGVzIHdpdGggYWdlID0gMjEKCmBgYHtyfQpnX21vZCA8LSBkZWxldGVfdmVydGljZXMoZyx3aGljaChWKGcpJGFnZSA9PSAyMSkpCnBsb3QoZ19tb2QpCmBgYAoKKipRVUVTVElPTjoqKjogV3JpdGUgdGhlIGNvZGUgdG8gcmVtb3ZlIGFsbCBub2RlcyBmcm9tIGBnYCBmb3Igd2hpY2ggYWdlIGlzIG1pc3NpbmcuCgpgYGB7cn0KZ19tb2QgPC0gZGVsZXRlX3ZlcnRpY2VzKGcsIHdoaWNoKGlzLm5hKFYoZykkYWdlKSkpCnBsb3QoZ19tb2QpCmBgYAoKQW4gYWx0ZXJuYXRpdmUgdG8gYHNldF92ZXJ0ZXhfYXR0cigpYCB0byBzZXQgYXR0cmlidXRlcyB1c2luZyBWKCApCgpgYGB7cn0KVihnKSRnZW5kZXIgPC0gYygibWFsZSIsICJmZW1hbGUiLCAiZmVtYWxlIiwgIm90aGVyIiwgIm1hbGUiKSAKZwpgYGAKClNpbWlsYXJseSwgd2UgY2FuIHVzZSBgRSgpYCB0byBhY2Nlc3MsIGFkZCBhbmQgbW9kaWZ5IGVkZ2UgYXR0cmlidXRlcy4KClVzZSBgcmV2ZXJzZSgpYCB0byByZXZlcnNlIHRoZSBkaXJlY3Rpb24gb2YgYWxsIGVkZ2VzCgpgYGB7cn0KZ19yZXYgPC0gcmV2ZXJzZV9lZGdlcyhnKQpwbG90KGdfcmV2KQpgYGAKCnVzZSBgdW5pb24oKWAgdG8gY29tYmluZSB0aGUgZWRnZXMgb2YgdHdvIGdyYXBocwoKYGBge3J9CmdfdW5pb24gPC0gaWdyYXBoOjp1bmlvbihnLCBnX3JldikKcGxvdChnX3VuaW9uKQpgYGAKCioqKlFVRVNUSU9OKioqOiBCZWZvcmUgeW91IHJ1biBgcGxvdChnX3VuaW9uKWAsIHRoaW5rIGFib3V0IHdoYXQgdGhlIHJlc3VsdGluZyBuZXR3b3JrIHNob3VsZCBsb29rIGxpa2UuIFRodXMsIHdoYXQgY291bGQgeW91IHVzZSB0aGUgY29tYmluYXRpb24gb2YgYHJldmVyc2UoKWAgYW5kIGB1bmlvbigpYCBmb3I/CgpUcmFuc2ZlciBkaXJlY3Rpb25hbCBuZXR3b3JrIGludG8gaW5kaXJlY3Rpb25hbCBvbmUKCkEgc2ltaWxhciByZXN1bHQgY2FuIGJlIGRvbmUgYXM6CgpgYGB7cn0KZ191bmRpciA8LSBhc191bmRpcmVjdGVkKGcpCnBsb3QoZ191bmRpcikKYGBgCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Tutorial1_data handling.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
