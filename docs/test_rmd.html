@@ -11,11 +11,11 @@
 
 <meta name="author" content="Rense" />
 
-<meta name="date" content="2026-04-24" />
+<meta name="date" content="2026-04-30" />
 
 <title>test_rmd</title>
 
-<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -347,10 +347,13 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="lab1.html">Page 1</a>
+      <a href="Tutorial1_data handling.html">Tutorial1</a>
     </li>
     <li>
-      <a href="test_rmd.html">Page 2</a>
+      <a href="Tutorial2_basic analysis.html">Tutorial2</a>
+    </li>
+    <li>
+      <a href="Tutorial3_Knecht data.html">Tutorial3</a>
     </li>
   </ul>
 </li>
@@ -383,7 +386,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">test_rmd</h1>
 <h4 class="author">Rense</h4>
-<h4 class="date">2026-04-24</h4>
+<h4 class="date">2026-04-30</h4>
 
 </div>
 
@@ -416,7 +419,7 @@ code chunk to prevent printing of the R code that generated the
 plot.</p>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogInRlc3Rfcm1kIg0KYXV0aG9yOiAiUmVuc2UiDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkNCmBgYA0KDQojIyBSIE1hcmtkb3duDQoNClRoaXMgaXMgYW4gUiBNYXJrZG93biBkb2N1bWVudC4gTWFya2Rvd24gaXMgYSBzaW1wbGUgZm9ybWF0dGluZyBzeW50YXggZm9yIGF1dGhvcmluZyBIVE1MLCBQREYsIGFuZCBNUyBXb3JkIGRvY3VtZW50cy4gRm9yIG1vcmUgZGV0YWlscyBvbiB1c2luZyBSIE1hcmtkb3duIHNlZSA8aHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbT4uDQoNCldoZW4geW91IGNsaWNrIHRoZSAqKktuaXQqKiBidXR0b24gYSBkb2N1bWVudCB3aWxsIGJlIGdlbmVyYXRlZCB0aGF0IGluY2x1ZGVzIGJvdGggY29udGVudCBhcyB3ZWxsIGFzIHRoZSBvdXRwdXQgb2YgYW55IGVtYmVkZGVkIFIgY29kZSBjaHVua3Mgd2l0aGluIHRoZSBkb2N1bWVudC4gWW91IGNhbiBlbWJlZCBhbiBSIGNvZGUgY2h1bmsgbGlrZSB0aGlzOg0KDQpgYGB7ciBjYXJzfQ0Kc3VtbWFyeShjYXJzKQ0KYGBgDQoNCiMjIEluY2x1ZGluZyBQbG90cw0KDQpZb3UgY2FuIGFsc28gZW1iZWQgcGxvdHMsIGZvciBleGFtcGxlOg0KDQpgYGB7ciBwcmVzc3VyZSwgZWNobz1GQUxTRX0NCnBsb3QocHJlc3N1cmUpDQpgYGANCg0KTm90ZSB0aGF0IHRoZSBgZWNobyA9IEZBTFNFYCBwYXJhbWV0ZXIgd2FzIGFkZGVkIHRvIHRoZSBjb2RlIGNodW5rIHRvIHByZXZlbnQgcHJpbnRpbmcgb2YgdGhlIFIgY29kZSB0aGF0IGdlbmVyYXRlZCB0aGUgcGxvdC4NCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAidGVzdF9ybWQiCmF1dGhvcjogIlJlbnNlIgpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiCm91dHB1dDogaHRtbF9kb2N1bWVudAotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpCmBgYAoKIyMgUiBNYXJrZG93bgoKVGhpcyBpcyBhbiBSIE1hcmtkb3duIGRvY3VtZW50LiBNYXJrZG93biBpcyBhIHNpbXBsZSBmb3JtYXR0aW5nIHN5bnRheCBmb3IgYXV0aG9yaW5nIEhUTUwsIFBERiwgYW5kIE1TIFdvcmQgZG9jdW1lbnRzLiBGb3IgbW9yZSBkZXRhaWxzIG9uIHVzaW5nIFIgTWFya2Rvd24gc2VlIDxodHRwOi8vcm1hcmtkb3duLnJzdHVkaW8uY29tPi4KCldoZW4geW91IGNsaWNrIHRoZSAqKktuaXQqKiBidXR0b24gYSBkb2N1bWVudCB3aWxsIGJlIGdlbmVyYXRlZCB0aGF0IGluY2x1ZGVzIGJvdGggY29udGVudCBhcyB3ZWxsIGFzIHRoZSBvdXRwdXQgb2YgYW55IGVtYmVkZGVkIFIgY29kZSBjaHVua3Mgd2l0aGluIHRoZSBkb2N1bWVudC4gWW91IGNhbiBlbWJlZCBhbiBSIGNvZGUgY2h1bmsgbGlrZSB0aGlzOgoKYGBge3IgY2Fyc30Kc3VtbWFyeShjYXJzKQpgYGAKCiMjIEluY2x1ZGluZyBQbG90cwoKWW91IGNhbiBhbHNvIGVtYmVkIHBsb3RzLCBmb3IgZXhhbXBsZToKCmBgYHtyIHByZXNzdXJlLCBlY2hvPUZBTFNFfQpwbG90KHByZXNzdXJlKQpgYGAKCk5vdGUgdGhhdCB0aGUgYGVjaG8gPSBGQUxTRWAgcGFyYW1ldGVyIHdhcyBhZGRlZCB0byB0aGUgY29kZSBjaHVuayB0byBwcmV2ZW50IHByaW50aW5nIG9mIHRoZSBSIGNvZGUgdGhhdCBnZW5lcmF0ZWQgdGhlIHBsb3QuCg==</div>
 
 
 </div>
