@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zeyu(Zey)" />
+
+<meta name="date" content="2026-04-29" />
+
+<title>Tutorial 2-Basic network analysis</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    My journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Tutorial1_Data-handling.html">Tutorial1-Data handling</a>
+    </li>
+    <li>
+      <a href="test_rmd.html">Page 2</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/robfranken/LabJournal">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Tutorial 2-Basic network analysis</h1>
+<h4 class="author">Zeyu(Zey)</h4>
+<h4 class="date">2026-04-29</h4>
+
+</div>
+
+
+<div id="r-markdown" class="section level2" number="1">
+<h2><span class="header-section-number">1</span> R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting
+syntax for authoring HTML, PDF, and MS Word documents. For more details
+on using R Markdown see <a href="http://rmarkdown.rstudio.com"
+class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be
+generated that includes both content as well as the output of any
+embedded R code chunks within the document. You can embed an R code
+chunk like this:</p>
+<pre class="r"><code>summary(cars)</code></pre>
+<pre><code>##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00</code></pre>
+</div>
+<div id="including-plots" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="Tutorial2_basic-analysis_files/figure-html/pressure-1.png" alt="" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the
+code chunk to prevent printing of the R code that generated the
+plot.</p>
+<p>load “karate club” data</p>
+<pre class="r"><code>library(igraph)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     decompose, spectrum</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     union</code></pre>
+<pre class="r"><code>z &lt;- make_graph(&quot;Zachary&quot;)
+z</code></pre>
+<pre><code>## IGRAPH 0305e37 U--- 34 78 -- Zachary
+## + attr: name (g/c)
+## + edges from 0305e37:
+##  [1]  1-- 2  1-- 3  1-- 4  1-- 5  1-- 6  1-- 7  1-- 8  1-- 9  1--11  1--12
+## [11]  1--13  1--14  1--18  1--20  1--22  1--32  2-- 3  2-- 4  2-- 8  2--14
+## [21]  2--18  2--20  2--22  2--31  3-- 4  3-- 8  3--28  3--29  3--33  3--10
+## [31]  3-- 9  3--14  4-- 8  4--13  4--14  5-- 7  5--11  6-- 7  6--11  6--17
+## [41]  7--17  9--31  9--33  9--34 10--34 14--34 15--33 15--34 16--33 16--34
+## [51] 19--33 19--34 20--34 21--33 21--34 23--33 23--34 24--26 24--28 24--33
+## [61] 24--34 24--30 25--26 25--28 25--32 26--32 27--30 27--34 28--34 29--32
+## [71] 29--34 30--33 30--34 31--33 31--34 32--33 32--34 33--34</code></pre>
+<pre class="r"><code>plot(z)</code></pre>
+<p><img src="Tutorial2_basic-analysis_files/figure-html/unnamed-chunk-1-1.png" alt="" width="672" /></p>
+<p>check whether it is directional</p>
+<pre class="r"><code>is_directed(z)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="network-level-a-five-number-summary" class="section level2"
+number="3">
+<h2><span class="header-section-number">3</span> 2.1 Network level: a
+“five number summary”</h2>
+<p>Ask for numbers of vertices and edges specifically</p>
+<pre class="r"><code>vcount(z)</code></pre>
+<pre><code>## [1] 34</code></pre>
+<pre class="r"><code>ecount(z)</code></pre>
+<pre><code>## [1] 78</code></pre>
+<p><strong>Density</strong>: existing edges / the maximum possible
+number of edges</p>
+<pre class="r"><code>edge_density(z)</code></pre>
+<pre><code>## [1] 0.1390374</code></pre>
+<p><strong>QUESTION</strong>: How would you calculate density using
+<code>ecount()</code> and <code>vcount()</code>?</p>
+<pre class="r"><code>ecount(z)/(vcount(z)*(vcount(z)-1)/2)</code></pre>
+<pre><code>## [1] 0.1390374</code></pre>
+<pre class="r"><code>#for undireactional</code></pre>
+<p>If desired, we can also add such network-level results to the network
+object, for later use:</p>
+<pre class="r"><code>z$density &lt;- edge_density(z)
+z</code></pre>
+<pre><code>## IGRAPH 0305e37 U--- 34 78 -- Zachary
+## + attr: name (g/c), density (g/n)
+## + edges from 0305e37:
+##  [1]  1-- 2  1-- 3  1-- 4  1-- 5  1-- 6  1-- 7  1-- 8  1-- 9  1--11  1--12
+## [11]  1--13  1--14  1--18  1--20  1--22  1--32  2-- 3  2-- 4  2-- 8  2--14
+## [21]  2--18  2--20  2--22  2--31  3-- 4  3-- 8  3--28  3--29  3--33  3--10
+## [31]  3-- 9  3--14  4-- 8  4--13  4--14  5-- 7  5--11  6-- 7  6--11  6--17
+## [41]  7--17  9--31  9--33  9--34 10--34 14--34 15--33 15--34 16--33 16--34
+## [51] 19--33 19--34 20--34 21--33 21--34 23--33 23--34 24--26 24--28 24--33
+## [61] 24--34 24--30 25--26 25--28 25--32 26--32 27--30 27--34 28--34 29--32
+## [71] 29--34 30--33 30--34 31--33 31--34 32--33 32--34 33--34</code></pre>
+<p><strong>Number of components</strong>: the number of unconnected
+parts of the network</p>
+<pre class="r"><code>count_components(z)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<p><strong>The diameter of a network</strong>: the “longest shortest
+path” in the network</p>
+<pre class="r"><code>diameter(z)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p><strong>The <em>average</em> shortest path length</strong>: the
+average of all the shortest path over all pairs of vertices in the
+network. (the key indicator in the “small world phenomenon”)</p>
+<pre class="r"><code>mean_distance(z)</code></pre>
+<pre><code>## [1] 2.4082</code></pre>
+<p>Clustering (transitivity): the extent to which triangles tend to be
+closed in the network, or put differently, to what extent neighbors of
+nodes tend to be connected themselves.</p>
+<p><strong>Clustering Coefficient:</strong> for each vertex, the
+proportion of the potential ties between the vertex’ neighbors that
+actually exist (in the ego networks literature, this is referred to as
+local density), and averages this over all vertices.</p>
+<pre class="r"><code>transitivity(z, type=&quot;average&quot;)</code></pre>
+<pre><code>## [1] 0.5879306</code></pre>
+</div>
+<div id="individual-level-centrality" class="section level2" number="4">
+<h2><span class="header-section-number">4</span> 2.2 Individual level:
+centrality</h2>
+<p><strong>Degree centrality:</strong> the number of connections per
+node</p>
+<pre class="r"><code>degree(z)</code></pre>
+<pre><code>##  [1] 16  9 10  6  3  4  4  4  5  2  3  1  2  5  2  2  2  2  2  3  2  2  2  5  3
+## [26]  3  2  4  3  4  4  6 12 17</code></pre>
+<pre class="r"><code>#note this is a vector, and can be further analysed:
+
+summary(degree(z))</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   1.000   2.000   3.000   4.588   5.000  17.000</code></pre>
+<pre class="r"><code>hist(degree(z))</code></pre>
+<p><img src="Tutorial2_basic-analysis_files/figure-html/unnamed-chunk-11-1.png" alt="" width="672" /></p>
+<pre class="r"><code># keep the individual-level results on centrality and add them to the network object for later use
+V(z)$degree &lt;- degree(z)
+
+#use it in a plot
+#We add  + 8 to degree to avoid that the lowest-degree nodes become really small and specify margin = -0.1 to reduce the whitespace around the plot
+plot(z, vertex.size = V(z)$degree+8, margin= -0.1)</code></pre>
+<p><img src="Tutorial2_basic-analysis_files/figure-html/unnamed-chunk-11-2.png" alt="" width="672" /></p>
+<pre class="r"><code>#extract the degree of a specific vertex
+degree(z, v = 3)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p><strong>betweenness centrality:</strong></p>
+<p>step1: find shortest paths in all vertices pairs</p>
+<p>step2: find how many these shortest paths go through a certain
+vertice</p>
+<pre class="r"><code>betweenness(z)</code></pre>
+<pre><code>##  [1] 231.0714286  28.4785714  75.8507937   6.2880952   0.3333333  15.8333333
+##  [7]  15.8333333   0.0000000  29.5293651   0.4476190   0.3333333   0.0000000
+## [13]   0.0000000  24.2158730   0.0000000   0.0000000   0.0000000   0.0000000
+## [19]   0.0000000  17.1468254   0.0000000   0.0000000   0.0000000   9.3000000
+## [25]   1.1666667   2.0277778   0.0000000  11.7920635   0.9476190   1.5428571
+## [31]   7.6095238  73.0095238  76.6904762 160.5515873</code></pre>
+<pre class="r"><code>#add it to the network object
+z &lt;- z %&gt;% 
+  set_vertex_attr(
+    name = &quot;betweenness&quot;,
+    value = betweenness(z)
+  )</code></pre>
+<p><strong>closeness centrality:</strong> relies on shortest paths,
+assesses how close each node is to the other nodes</p>
+<pre class="r"><code>V(z)$closeness &lt;- closeness(z)
+
+V(z)$closeness</code></pre>
+<pre><code>##  [1] 0.01724138 0.01470588 0.01694915 0.01408451 0.01149425 0.01162791
+##  [7] 0.01162791 0.01333333 0.01562500 0.01315789 0.01149425 0.01111111
+## [13] 0.01123596 0.01562500 0.01123596 0.01123596 0.00862069 0.01136364
+## [19] 0.01123596 0.01515152 0.01123596 0.01136364 0.01123596 0.01190476
+## [25] 0.01136364 0.01136364 0.01098901 0.01388889 0.01369863 0.01162791
+## [31] 0.01388889 0.01639344 0.01562500 0.01666667</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiVHV0b3JpYWwgMi1CYXNpYyBuZXR3b3JrIGFuYWx5c2lzIgphdXRob3I6ICJaZXl1KFpleSkiCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCIKb3V0cHV0OiBodG1sX2RvY3VtZW50Ci0tLQoKYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9CmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkKYGBgCgojIyBSIE1hcmtkb3duCgpUaGlzIGlzIGFuIFIgTWFya2Rvd24gZG9jdW1lbnQuIE1hcmtkb3duIGlzIGEgc2ltcGxlIGZvcm1hdHRpbmcgc3ludGF4IGZvciBhdXRob3JpbmcgSFRNTCwgUERGLCBhbmQgTVMgV29yZCBkb2N1bWVudHMuIEZvciBtb3JlIGRldGFpbHMgb24gdXNpbmcgUiBNYXJrZG93biBzZWUgPGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20+LgoKV2hlbiB5b3UgY2xpY2sgdGhlICoqS25pdCoqIGJ1dHRvbiBhIGRvY3VtZW50IHdpbGwgYmUgZ2VuZXJhdGVkIHRoYXQgaW5jbHVkZXMgYm90aCBjb250ZW50IGFzIHdlbGwgYXMgdGhlIG91dHB1dCBvZiBhbnkgZW1iZWRkZWQgUiBjb2RlIGNodW5rcyB3aXRoaW4gdGhlIGRvY3VtZW50LiBZb3UgY2FuIGVtYmVkIGFuIFIgY29kZSBjaHVuayBsaWtlIHRoaXM6CgpgYGB7ciBjYXJzfQpzdW1tYXJ5KGNhcnMpCmBgYAoKIyMgSW5jbHVkaW5nIFBsb3RzCgpZb3UgY2FuIGFsc28gZW1iZWQgcGxvdHMsIGZvciBleGFtcGxlOgoKYGBge3IgcHJlc3N1cmUsIGVjaG89RkFMU0V9CnBsb3QocHJlc3N1cmUpCmBgYAoKTm90ZSB0aGF0IHRoZSBgZWNobyA9IEZBTFNFYCBwYXJhbWV0ZXIgd2FzIGFkZGVkIHRvIHRoZSBjb2RlIGNodW5rIHRvIHByZXZlbnQgcHJpbnRpbmcgb2YgdGhlIFIgY29kZSB0aGF0IGdlbmVyYXRlZCB0aGUgcGxvdC4KCmxvYWQg4oCca2FyYXRlIGNsdWLigJ0gZGF0YQoKYGBge3J9CmxpYnJhcnkoaWdyYXBoKQp6IDwtIG1ha2VfZ3JhcGgoIlphY2hhcnkiKQp6CgpwbG90KHopCmBgYAoKY2hlY2sgd2hldGhlciBpdCBpcyBkaXJlY3Rpb25hbAoKYGBge3J9Cgppc19kaXJlY3RlZCh6KQpgYGAKCiMjIDIuMSBOZXR3b3JrIGxldmVsOiBhIOKAnGZpdmUgbnVtYmVyIHN1bW1hcnnigJ0KCkFzayBmb3IgbnVtYmVycyBvZiB2ZXJ0aWNlcyBhbmQgZWRnZXMgc3BlY2lmaWNhbGx5CgpgYGB7cn0KdmNvdW50KHopCmVjb3VudCh6KQpgYGAKCioqRGVuc2l0eSoqOiBleGlzdGluZyBlZGdlcyAvIHRoZSBtYXhpbXVtIHBvc3NpYmxlIG51bWJlciBvZiBlZGdlcwoKYGBge3J9CmVkZ2VfZGVuc2l0eSh6KQpgYGAKCioqUVVFU1RJT04qKjogSG93IHdvdWxkIHlvdSBjYWxjdWxhdGUgZGVuc2l0eSB1c2luZyBgZWNvdW50KClgIGFuZCBgdmNvdW50KClgPwoKYGBge3J9CmVjb3VudCh6KS8odmNvdW50KHopKih2Y291bnQoeiktMSkvMikKI2ZvciB1bmRpcmVhY3Rpb25hbApgYGAKCklmIGRlc2lyZWQsIHdlIGNhbiBhbHNvIGFkZCBzdWNoIG5ldHdvcmstbGV2ZWwgcmVzdWx0cyB0byB0aGUgbmV0d29yayBvYmplY3QsIGZvciBsYXRlciB1c2U6CgpgYGB7cn0KeiRkZW5zaXR5IDwtIGVkZ2VfZGVuc2l0eSh6KQp6CmBgYAoKKipOdW1iZXIgb2YgY29tcG9uZW50cyoqOiB0aGUgbnVtYmVyIG9mIHVuY29ubmVjdGVkIHBhcnRzIG9mIHRoZSBuZXR3b3JrCgpgYGB7cn0KY291bnRfY29tcG9uZW50cyh6KQpgYGAKCioqVGhlIGRpYW1ldGVyIG9mIGEgbmV0d29yayoqOiB0aGUg4oCcbG9uZ2VzdCBzaG9ydGVzdCBwYXRo4oCdIGluIHRoZSBuZXR3b3JrCgpgYGB7cn0KZGlhbWV0ZXIoeikKYGBgCgoqKlRoZSAqYXZlcmFnZSogc2hvcnRlc3QgcGF0aCBsZW5ndGgqKjogdGhlIGF2ZXJhZ2Ugb2YgYWxsIHRoZSBzaG9ydGVzdCBwYXRoIG92ZXIgYWxsIHBhaXJzIG9mIHZlcnRpY2VzIGluIHRoZSBuZXR3b3JrLiAodGhlIGtleSBpbmRpY2F0b3IgaW4gdGhlIOKAnHNtYWxsIHdvcmxkIHBoZW5vbWVub27igJ0pCgpgYGB7cn0KbWVhbl9kaXN0YW5jZSh6KQpgYGAKCkNsdXN0ZXJpbmcgKHRyYW5zaXRpdml0eSk6IHRoZSBleHRlbnQgdG8gd2hpY2ggdHJpYW5nbGVzIHRlbmQgdG8gYmUgY2xvc2VkIGluIHRoZSBuZXR3b3JrLCBvciBwdXQgZGlmZmVyZW50bHksIHRvIHdoYXQgZXh0ZW50IG5laWdoYm9ycyBvZiBub2RlcyB0ZW5kIHRvIGJlIGNvbm5lY3RlZCB0aGVtc2VsdmVzLgoKKipDbHVzdGVyaW5nIENvZWZmaWNpZW50OioqIGZvciBlYWNoIHZlcnRleCwgdGhlIHByb3BvcnRpb24gb2YgdGhlIHBvdGVudGlhbCB0aWVzIGJldHdlZW4gdGhlIHZlcnRleOKAmSBuZWlnaGJvcnMgdGhhdCBhY3R1YWxseSBleGlzdCAoaW4gdGhlIGVnbyBuZXR3b3JrcyBsaXRlcmF0dXJlLCB0aGlzIGlzIHJlZmVycmVkIHRvIGFzIGxvY2FsIGRlbnNpdHkpLCBhbmQgYXZlcmFnZXMgdGhpcyBvdmVyIGFsbCB2ZXJ0aWNlcy4KCmBgYHtyfQp0cmFuc2l0aXZpdHkoeiwgdHlwZT0iYXZlcmFnZSIpCmBgYAoKIyMgMi4yIEluZGl2aWR1YWwgbGV2ZWw6IGNlbnRyYWxpdHkKCioqRGVncmVlIGNlbnRyYWxpdHk6KiogdGhlIG51bWJlciBvZiBjb25uZWN0aW9ucyBwZXIgbm9kZQoKYGBge3J9CmRlZ3JlZSh6KQoKI25vdGUgdGhpcyBpcyBhIHZlY3RvciwgYW5kIGNhbiBiZSBmdXJ0aGVyIGFuYWx5c2VkOgoKc3VtbWFyeShkZWdyZWUoeikpCmhpc3QoZGVncmVlKHopKQoKIyBrZWVwIHRoZSBpbmRpdmlkdWFsLWxldmVsIHJlc3VsdHMgb24gY2VudHJhbGl0eSBhbmQgYWRkIHRoZW0gdG8gdGhlIG5ldHdvcmsgb2JqZWN0IGZvciBsYXRlciB1c2UKVih6KSRkZWdyZWUgPC0gZGVncmVlKHopCgojdXNlIGl0IGluIGEgcGxvdAojV2UgYWRkICArIDggdG8gZGVncmVlIHRvIGF2b2lkIHRoYXQgdGhlIGxvd2VzdC1kZWdyZWUgbm9kZXMgYmVjb21lIHJlYWxseSBzbWFsbCBhbmQgc3BlY2lmeSBtYXJnaW4gPSAtMC4xIHRvIHJlZHVjZSB0aGUgd2hpdGVzcGFjZSBhcm91bmQgdGhlIHBsb3QKcGxvdCh6LCB2ZXJ0ZXguc2l6ZSA9IFYoeikkZGVncmVlKzgsIG1hcmdpbj0gLTAuMSkKCiNleHRyYWN0IHRoZSBkZWdyZWUgb2YgYSBzcGVjaWZpYyB2ZXJ0ZXgKZGVncmVlKHosIHYgPSAzKQpgYGAKCioqYmV0d2Vlbm5lc3MgY2VudHJhbGl0eToqKgoKc3RlcDE6IGZpbmQgc2hvcnRlc3QgcGF0aHMgaW4gYWxsIHZlcnRpY2VzIHBhaXJzCgpzdGVwMjogZmluZCBob3cgbWFueSB0aGVzZSBzaG9ydGVzdCBwYXRocyBnbyB0aHJvdWdoIGEgY2VydGFpbiB2ZXJ0aWNlCgpgYGB7cn0KYmV0d2Vlbm5lc3MoeikKCiNhZGQgaXQgdG8gdGhlIG5ldHdvcmsgb2JqZWN0CnogPC0geiAlPiUgCiAgc2V0X3ZlcnRleF9hdHRyKAogICAgbmFtZSA9ICJiZXR3ZWVubmVzcyIsCiAgICB2YWx1ZSA9IGJldHdlZW5uZXNzKHopCiAgKQpgYGAKCioqY2xvc2VuZXNzIGNlbnRyYWxpdHk6KiogcmVsaWVzIG9uIHNob3J0ZXN0IHBhdGhzLCBhc3Nlc3NlcyBob3cgY2xvc2UgZWFjaCBub2RlIGlzIHRvIHRoZSBvdGhlciBub2RlcwoKYGBge3J9ClYoeikkY2xvc2VuZXNzIDwtIGNsb3NlbmVzcyh6KQoKVih6KSRjbG9zZW5lc3MKYGBgCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Tutorial2_basic analysis.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

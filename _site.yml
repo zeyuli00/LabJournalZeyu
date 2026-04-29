@@ -14,8 +14,8 @@ navbar:
       menu:
       - text: "Tutorial1-Data handling"
         href: Tutorial1_Data-handling.html
-      - text: "Page 2"
-        href: test_rmd.html
+      - text: "Tutroial2-Basic analysis"
+        href: Tutroial2-basic-analysis.html
         
         # here, other .Rmds can be added
 

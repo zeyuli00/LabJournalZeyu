@@ -1,0 +1,150 @@
+---
+title: "Tutorial 2-Basic network analysis"
+author: "Zeyu(Zey)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+load “karate club” data
+
+```{r}
+library(igraph)
+z <- make_graph("Zachary")
+z
+
+plot(z)
+```
+
+check whether it is directional
+
+```{r}
+
+is_directed(z)
+```
+
+## 2.1 Network level: a “five number summary”
+
+Ask for numbers of vertices and edges specifically
+
+```{r}
+vcount(z)
+ecount(z)
+```
+
+**Density**: existing edges / the maximum possible number of edges
+
+```{r}
+edge_density(z)
+```
+
+**QUESTION**: How would you calculate density using `ecount()` and `vcount()`?
+
+```{r}
+ecount(z)/(vcount(z)*(vcount(z)-1)/2)
+#for undireactional
+```
+
+If desired, we can also add such network-level results to the network object, for later use:
+
+```{r}
+z$density <- edge_density(z)
+z
+```
+
+**Number of components**: the number of unconnected parts of the network
+
+```{r}
+count_components(z)
+```
+
+**The diameter of a network**: the “longest shortest path” in the network
+
+```{r}
+diameter(z)
+```
+
+**The *average* shortest path length**: the average of all the shortest path over all pairs of vertices in the network. (the key indicator in the “small world phenomenon”)
+
+```{r}
+mean_distance(z)
+```
+
+Clustering (transitivity): the extent to which triangles tend to be closed in the network, or put differently, to what extent neighbors of nodes tend to be connected themselves.
+
+**Clustering Coefficient:** for each vertex, the proportion of the potential ties between the vertex’ neighbors that actually exist (in the ego networks literature, this is referred to as local density), and averages this over all vertices.
+
+```{r}
+transitivity(z, type="average")
+```
+
+## 2.2 Individual level: centrality
+
+**Degree centrality:** the number of connections per node
+
+```{r}
+degree(z)
+
+#note this is a vector, and can be further analysed:
+
+summary(degree(z))
+hist(degree(z))
+
+# keep the individual-level results on centrality and add them to the network object for later use
+V(z)$degree <- degree(z)
+
+#use it in a plot
+#We add  + 8 to degree to avoid that the lowest-degree nodes become really small and specify margin = -0.1 to reduce the whitespace around the plot
+plot(z, vertex.size = V(z)$degree+8, margin= -0.1)
+
+#extract the degree of a specific vertex
+degree(z, v = 3)
+```
+
+**betweenness centrality:**
+
+step1: find shortest paths in all vertices pairs
+
+step2: find how many these shortest paths go through a certain vertice
+
+```{r}
+betweenness(z)
+
+#add it to the network object
+z <- z %>% 
+  set_vertex_attr(
+    name = "betweenness",
+    value = betweenness(z)
+  )
+```
+
+**closeness centrality:** relies on shortest paths, assesses how close each node is to the other nodes
+
+```{r}
+V(z)$closeness <- closeness(z)
+
+V(z)$closeness
+```
