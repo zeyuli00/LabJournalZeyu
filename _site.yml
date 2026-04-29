@@ -1,6 +1,6 @@
-name: "Example Lab Journal"
+name: "My Lab Journal"
 author: 
-  - 'Your Name'
+  - 'Zeyu(Zey) Li'
 output_dir: "docs"
 exclude: 
   - "data"
@@ -12,10 +12,12 @@ navbar:
       href: index.html
     - text: "My journal"
       menu:
-      - text: "Tutorial1-Data handling"
+      - text: "Tutorial1"
         href: Tutorial1_Data-handling.html
-      - text: "Tutroial2-Basic analysis"
-        href: Tutroial2-basic-analysis.html
+      - text: "Tutroial2"
+        href: Tutroial2_basic-analysis.html
+      - text: "Tutroial3"
+        href: Tutroial3_Knecht data.html
         
         # here, other .Rmds can be added
 
