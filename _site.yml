@@ -18,6 +18,8 @@ navbar:
         href: "Tutorial2_basic-analysis.html"
       - text: "Tutorial3"
         href: "Tutorial3_Knecht-data.html"
+      - text: "Tutorial4"
+        href: "Tutorial4_Spatial-regression-analysis.html"
         
         # here, other .Rmds can be added
 

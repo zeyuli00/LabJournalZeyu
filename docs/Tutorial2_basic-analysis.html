@@ -355,6 +355,9 @@ div.tocify {
     <li>
       <a href="Tutorial3_Knecht-data.html">Tutorial3</a>
     </li>
+    <li>
+      <a href="Tutorial4_Spatial-regression-analysis.html">Tutorial4</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -421,9 +424,9 @@ plot.</p>
 <pre class="r"><code>library(igraph)
 z &lt;- make_graph(&quot;Zachary&quot;)
 z</code></pre>
-<pre><code>## IGRAPH 0e4859b U--- 34 78 -- Zachary
+<pre><code>## IGRAPH 558d331 U--- 34 78 -- Zachary
 ## + attr: name (g/c)
-## + edges from 0e4859b:
+## + edges from 558d331:
 ##  [1]  1-- 2  1-- 3  1-- 4  1-- 5  1-- 6  1-- 7  1-- 8  1-- 9  1--11  1--12  1--13  1--14  1--18
 ## [14]  1--20  1--22  1--32  2-- 3  2-- 4  2-- 8  2--14  2--18  2--20  2--22  2--31  3-- 4  3-- 8
 ## [27]  3--28  3--29  3--33  3--10  3-- 9  3--14  4-- 8  4--13  4--14  5-- 7  5--11  6-- 7  6--11
@@ -458,9 +461,9 @@ number of edges</p>
 object, for later use:</p>
 <pre class="r"><code>z$density &lt;- edge_density(z)
 z</code></pre>
-<pre><code>## IGRAPH 0e4859b U--- 34 78 -- Zachary
+<pre><code>## IGRAPH 558d331 U--- 34 78 -- Zachary
 ## + attr: name (g/c), density (g/n)
-## + edges from 0e4859b:
+## + edges from 558d331:
 ##  [1]  1-- 2  1-- 3  1-- 4  1-- 5  1-- 6  1-- 7  1-- 8  1-- 9  1--11  1--12  1--13  1--14  1--18
 ## [14]  1--20  1--22  1--32  2-- 3  2-- 4  2-- 8  2--14  2--18  2--20  2--22  2--31  3-- 4  3-- 8
 ## [27]  3--28  3--29  3--33  3--10  3-- 9  3--14  4-- 8  4--13  4--14  5-- 7  5--11  6-- 7  6--11

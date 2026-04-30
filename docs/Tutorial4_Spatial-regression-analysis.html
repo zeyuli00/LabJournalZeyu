@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zeyu(Zey)" />
+
+<meta name="date" content="2026-04-30" />
+
+<title>Tutorial4_Spatial regression analysis</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    My journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Tutorial1_data-handling.html">Tutorial1</a>
+    </li>
+    <li>
+      <a href="Tutorial2_basic-analysis.html">Tutorial2</a>
+    </li>
+    <li>
+      <a href="Tutorial3_Knecht-data.html">Tutorial3</a>
+    </li>
+    <li>
+      <a href="Tutorial4_Spatial-regression-analysis.html">Tutorial4</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/robfranken/LabJournal">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Tutorial4_Spatial regression analysis</h1>
+<h4 class="author">Zeyu(Zey)</h4>
+<h4 class="date">2026-04-30</h4>
+
+</div>
+
+
+<div id="constructing-a-spatial-weight-matrix" class="section level2"
+number="1">
+<h2><span class="header-section-number">1</span> 4.1 Constructing a
+Spatial Weight Matrix</h2>
+<pre class="r"><code>library(spdep)</code></pre>
+<pre><code>## Loading required package: spData</code></pre>
+<pre><code>## To access larger datasets in this package, install the spDataLarge package with:
+## `install.packages(&#39;spDataLarge&#39;, repos=&#39;https://nowosad.github.io/drat/&#39;, type=&#39;source&#39;)`</code></pre>
+<pre><code>## Loading required package: sf</code></pre>
+<pre><code>## Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
+<pre class="r"><code>library(spatialreg)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## 
+## Attaching package: &#39;spatialreg&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:spdep&#39;:
+## 
+##     get.ClusterOption, get.coresOption, get.mcOption, get.VerboseOption,
+##     get.ZeroPolicyOption, set.ClusterOption, set.coresOption, set.mcOption,
+##     set.VerboseOption, set.ZeroPolicyOption</code></pre>
+<pre class="r"><code>#read data (it is already in the program so do not need to download it)
+data(columbus)
+mydata &lt;- columbus
+
+#use &quot;attach&quot; to prevent typing &quot;$&quot; for every variables
+attach(mydata)
+
+#Col.gal.nb provides an adjacency list of neighbors. We give it a better name
+neighbors &lt;- col.gal.nb
+
+#check the class of the adjacency list
+class(neighbors)</code></pre>
+<pre><code>## [1] &quot;nb&quot;</code></pre>
+<p>Note: it is an ‘nb’ or ‘neighborhood’ object. Usually we need to
+first convert a dataframe to ‘nb’, and then to a ‘weighted list - listw’
+object.</p>
+<pre class="r"><code>#dataframe to nb
+
+#class(dataframe) &lt;- “nb”
+#nb2listw(nblist)</code></pre>
+<p>Another approach (which is more suitable when having isolates) is to
+first make an adjacency matrix. Then you can use:
+listw&lt;-mat2listw(adjacencymatrix).</p>
+<pre class="r"><code>#convert nb to listw
+#style = &quot;W&quot; means row-standardize
+listw &lt;- nb2listw(neighbors, style = &quot;W&quot;)
+summary(listw)</code></pre>
+<pre><code>## Characteristics of weights list object:
+## Neighbour list object:
+## Number of regions: 49 
+## Number of nonzero links: 230 
+## Percentage nonzero weights: 9.579342 
+## Average number of links: 4.693878 
+## Link number distribution:
+## 
+##  2  3  4  5  6  7  8  9 10 
+##  7  7 13  4  9  6  1  1  1 
+## 7 least connected regions:
+## 1005 1008 1045 1047 1049 1048 1015 with 2 links
+## 1 most connected region:
+## 1017 with 10 links
+## 
+## Weights style: W 
+## Weights constants summary:
+##    n   nn S0       S1       S2
+## W 49 2401 49 23.48489 204.6687</code></pre>
+<p>We see that an average region has about 5 neighbors.</p>
+</div>
+<div id="linear-regression-analysis" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> 4.2 Linear Regression
+Analysis</h2>
+<pre class="r"><code>summary(CRIME)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.1783 20.0485 34.0008 35.1288 48.5855 68.8920</code></pre>
+<pre class="r"><code>summary(INC)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.477   9.963  13.380  14.375  18.324  31.070</code></pre>
+<pre class="r"><code>summary(HOVAL)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   17.90   25.70   33.50   38.44   43.30   96.40</code></pre>
+<pre class="r"><code>plot(neighbors, coords)</code></pre>
+<p><img src="Tutorial4_Spatial-regression-analysis_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></p>
+<pre class="r"><code>olsreg &lt;- lm(CRIME ~ INC + HOVAL)
+summary(olsreg)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = CRIME ~ INC + HOVAL)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -34.418  -6.388  -1.580   9.052  28.649 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  68.6190     4.7355  14.490  &lt; 2e-16 ***
+## INC          -1.5973     0.3341  -4.780 1.83e-05 ***
+## HOVAL        -0.2739     0.1032  -2.654   0.0109 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.43 on 46 degrees of freedom
+## Multiple R-squared:  0.5524, Adjusted R-squared:  0.5329 
+## F-statistic: 28.39 on 2 and 46 DF,  p-value: 9.341e-09</code></pre>
+</div>
+<div id="spatial-analysis" class="section level2" number="3">
+<h2><span class="header-section-number">3</span> 4.3 Spatial
+Analysis</h2>
+<div id="morans-i-test" class="section level3" number="3.1">
+<h3><span class="header-section-number">3.1</span> 4.3.1 Moran’s I
+test</h3>
+<pre class="r"><code>#see whether we need a spatial model in the first place
+moran.test(CRIME, listw)</code></pre>
+<pre><code>## 
+##  Moran I test under randomisation
+## 
+## data:  CRIME  
+## weights: listw    
+## 
+## Moran I statistic standard deviate = 5.3427, p-value = 4.578e-08
+## alternative hypothesis: greater
+## sample estimates:
+## Moran I statistic       Expectation          Variance 
+##       0.485770914      -0.020833333       0.008991121</code></pre>
+<pre class="r"><code>#null hypothesis: no spatial dependence
+# p&lt;0.05  null hypothesis rejected, we should use spatial model</code></pre>
+</div>
+<div
+id="lagrange-multiplier-tests-for-spatial-lag-and-spatial-error-dependencies"
+class="section level3" number="3.2">
+<h3><span class="header-section-number">3.2</span> 4.3.2 Lagrange
+multiplier tests for spatial lag and spatial error dependencies</h3>
+<pre class="r"><code>#which type of spatial models we should use
+lm.LMtests(olsreg, listw, test=c(&quot;LMlag&quot;, &quot;LMerr&quot;))</code></pre>
+<pre><code>## Please update scripts to use lm.RStests in place of lm.LMtests</code></pre>
+<pre><code>## 
+##  Rao&#39;s score (a.k.a Lagrange multiplier) diagnostics for spatial dependence
+## 
+## data:  
+## model: lm(formula = CRIME ~ INC + HOVAL)
+## test weights: listw
+## 
+## RSlag = 7.8557, df = 1, p-value = 0.005066
+## 
+## 
+##  Rao&#39;s score (a.k.a Lagrange multiplier) diagnostics for spatial dependence
+## 
+## data:  
+## model: lm(formula = CRIME ~ INC + HOVAL)
+## test weights: listw
+## 
+## RSerr = 4.6111, df = 1, p-value = 0.03177</code></pre>
+<pre class="r"><code>#null hypothesis:no spatial lag dependence
+#null hypothesis:no spatial error dependence
+
+#both rejected in this case</code></pre>
+</div>
+<div id="spatial-lag-model" class="section level3" number="3.3">
+<h3><span class="header-section-number">3.3</span> 4.3.3 Spatial lag
+model</h3>
+<pre class="r"><code>slm &lt;- lagsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = &quot;FALSE&quot;)
+summary(slm)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = &quot;FALSE&quot;)
+## 
+## Residuals:
+##         Min          1Q      Median          3Q         Max 
+## -37.4497093  -5.4565567   0.0016387   6.7159553  24.7107978 
+## 
+## Type: lag 
+## Coefficients: (asymptotic standard errors) 
+##              Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept) 46.851431   7.314754  6.4051 1.503e-10
+## INC         -1.073533   0.310872 -3.4533 0.0005538
+## HOVAL       -0.269997   0.090128 -2.9957 0.0027381
+## 
+## Rho: 0.40389, LR test value: 8.4179, p-value: 0.0037154
+## Asymptotic standard error: 0.12071
+##     z-value: 3.3459, p-value: 0.00082027
+## Wald statistic: 11.195, p-value: 0.00082027
+## 
+## Log likelihood: -183.1683 for lag model
+## ML residual variance (sigma squared): 99.164, (sigma: 9.9581)
+## Number of observations: 49 
+## Number of parameters estimated: 5 
+## AIC: 376.34, (AIC for lm: 382.75)
+## LM test for residual autocorrelation
+## test value: 0.19184, p-value: 0.66139</code></pre>
+<pre class="r"><code>#inspect direct and indirect effect
+#use a simulation with 200 iterations to obtain p-values
+# ‘zstats = TRUE’ to obtain p-values
+im&lt;-impacts(slm, listw = listw, zstats=TRUE, R=200)
+sums&lt;-summary(im,  zstats=T)
+
+#effect value(simulated)
+data.frame(sums$res)</code></pre>
+<pre><code>##       direct   indirect      total
+## 1 -1.1225156 -0.6783818 -1.8008973
+## 2 -0.2823163 -0.1706152 -0.4529315</code></pre>
+<pre class="r"><code>#effect p-value(simulated)
+data.frame(sums$pzmat)</code></pre>
+<pre><code>##                   Direct   Indirect       Total
+## INC dy/dx   0.0006434935 0.07852279 0.001896196
+## HOVAL dy/dx 0.0043876937 0.14051477 0.020550682</code></pre>
+</div>
+<div id="spatial-error-model" class="section level3" number="3.4">
+<h3><span class="header-section-number">3.4</span> 4.3.4 Spatial error
+model</h3>
+<pre class="r"><code>sem &lt;- errorsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = FALSE)
+summary(sem)</code></pre>
+<pre><code>## 
+## Call:errorsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = FALSE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -34.45950  -6.21730  -0.69775   7.65256  24.23631 
+## 
+## Type: error 
+## Coefficients: (asymptotic standard errors) 
+##              Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept) 61.053618   5.314875 11.4873 &lt; 2.2e-16
+## INC         -0.995473   0.337025 -2.9537 0.0031398
+## HOVAL       -0.307979   0.092584 -3.3265 0.0008794
+## 
+## Lambda: 0.52089, LR test value: 6.4441, p-value: 0.011132
+## Asymptotic standard error: 0.14129
+##     z-value: 3.6868, p-value: 0.00022713
+## Wald statistic: 13.592, p-value: 0.00022713
+## 
+## Log likelihood: -184.1552 for error model
+## ML residual variance (sigma squared): 99.98, (sigma: 9.999)
+## Number of observations: 49 
+## Number of parameters estimated: 5 
+## AIC: 378.31, (AIC for lm: 382.75)</code></pre>
+</div>
+<div id="spatial-autoregressive-combined-model" class="section level3"
+number="3.5">
+<h3><span class="header-section-number">3.5</span> 4.3.5 Spatial
+autoregressive combined model</h3>
+<pre class="r"><code>sac &lt;- sacsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = FALSE)
+summary(sac)</code></pre>
+<pre><code>## 
+## Call:sacsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = FALSE)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -37.1121  -4.6324  -0.3040   7.0306  24.6929 
+## 
+## Type: sac 
+## Coefficients: (asymptotic standard errors) 
+##              Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 49.051431  10.054986  4.8783 1.07e-06
+## INC         -1.068781   0.332839 -3.2111 0.001322
+## HOVAL       -0.283114   0.091526 -3.0933 0.001980
+## 
+## Rho: 0.35326
+## Asymptotic standard error: 0.19669
+##     z-value: 1.796, p-value: 0.072494
+## Lambda: 0.13199
+## Asymptotic standard error: 0.29905
+##     z-value: 0.44138, p-value: 0.65894
+## 
+## LR test value: 8.6082, p-value: 0.013513
+## 
+## Log likelihood: -183.0731 for sac model
+## ML residual variance (sigma squared): 99.423, (sigma: 9.9711)
+## Number of observations: 49 
+## Number of parameters estimated: 6 
+## AIC: 378.15, (AIC for lm: 382.75)</code></pre>
+<p>*both rho and lamda are insignificant now</p>
+<pre class="r"><code>#Impact: distinguish direct and indirect effects
+im2&lt;-impacts(sac, listw = listw, zstats=TRUE, R=200)
+sums2&lt;-summary(im2,  zstats=T)
+data.frame(sums2$res)</code></pre>
+<pre><code>##       direct   indirect     total
+## 1 -1.1045773 -0.5479948 -1.652572
+## 2 -0.2925956 -0.1451604 -0.437756</code></pre>
+<pre class="r"><code>data.frame(sums2$pzmat)</code></pre>
+<pre><code>##                   Direct  Indirect     Total
+## INC dy/dx   0.0007704884 0.7358440 0.4581173
+## HOVAL dy/dx 0.0050274880 0.6689089 0.4091779</code></pre>
+</div>
+<div id="spatial-durbin-model" class="section level3" number="3.6">
+<h3><span class="header-section-number">3.6</span> 4.3.6 Spatial Durbin
+model</h3>
+<pre class="r"><code>sdm &lt;- lagsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(sdm)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -37.15904  -6.62594  -0.39823   6.57561  23.62757 
+## 
+## Type: mixed 
+## Coefficients: (asymptotic standard errors) 
+##              Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept) 45.592893  13.128679  3.4728 0.0005151
+## INC         -0.939088   0.338229 -2.7765 0.0054950
+## HOVAL       -0.299605   0.090843 -3.2980 0.0009736
+## lag.INC     -0.618375   0.577052 -1.0716 0.2838955
+## lag.HOVAL    0.266615   0.183971  1.4492 0.1472760
+## 
+## Rho: 0.38251, LR test value: 4.1648, p-value: 0.041272
+## Asymptotic standard error: 0.16237
+##     z-value: 2.3557, p-value: 0.018488
+## Wald statistic: 5.5493, p-value: 0.018488
+## 
+## Log likelihood: -182.0161 for mixed model
+## ML residual variance (sigma squared): 95.051, (sigma: 9.7494)
+## Number of observations: 49 
+## Number of parameters estimated: 7 
+## AIC: 378.03, (AIC for lm: 380.2)
+## LM test for residual autocorrelation
+## test value: 0.101, p-value: 0.75063</code></pre>
+<pre class="r"><code>#Impact: distinguish direct and indirect effects
+im3&lt;-impacts(sdm, listw = listw, zstats=TRUE, R=200)
+sums3&lt;-summary(im3,  zstats=T)
+data.frame(sums3$res)</code></pre>
+<pre><code>##       direct   indirect       total
+## 1 -1.0418080 -1.4804246 -2.52223256
+## 2 -0.2836325  0.2302055 -0.05342697</code></pre>
+<pre class="r"><code>data.frame(sums3$pzmat)</code></pre>
+<pre><code>##                   Direct   Indirect       Total
+## INC dy/dx   0.0007435359 0.03856474 0.000433107
+## HOVAL dy/dx 0.0048064774 0.41986537 0.894074585</code></pre>
+</div>
+<div id="spatial-durbin-error-model" class="section level3"
+number="3.7">
+<h3><span class="header-section-number">3.7</span> 4.3.7 Spatial Durbin
+error model</h3>
+<pre class="r"><code>sdem &lt;- errorsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(sdem)</code></pre>
+<pre><code>## 
+## Call:errorsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -37.02060  -6.68585  -0.15142   6.51557  24.18199 
+## 
+## Type: error 
+## Coefficients: (asymptotic standard errors) 
+##              Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept) 73.258655   8.528043  8.5903 &lt; 2.2e-16
+## INC         -1.069530   0.324719 -3.2937 0.0009887
+## HOVAL       -0.280344   0.091809 -3.0535 0.0022615
+## lag.INC     -1.196774   0.568968 -2.1034 0.0354297
+## lag.HOVAL    0.146758   0.200872  0.7306 0.4650196
+## 
+## Lambda: 0.37613, LR test value: 3.7313, p-value: 0.053403
+## Asymptotic standard error: 0.16554
+##     z-value: 2.2721, p-value: 0.023079
+## Wald statistic: 5.1626, p-value: 0.023079
+## 
+## Log likelihood: -182.2329 for error model
+## ML residual variance (sigma squared): 96.022, (sigma: 9.7991)
+## Number of observations: 49 
+## Number of parameters estimated: 7 
+## AIC: 378.47, (AIC for lm: 380.2)</code></pre>
+</div>
+<div id="general-nested-model" class="section level3" number="3.8">
+<h3><span class="header-section-number">3.8</span> 4.3.8 General nested
+model</h3>
+<pre class="r"><code>gnm &lt;- sacsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(gnm)</code></pre>
+<pre><code>## 
+## Call:sacsarlm(formula = CRIME ~ INC + HOVAL, data = mydata, listw = listw,     Durbin = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -37.36766  -6.68648  -0.44936   6.38015  23.80258 
+## 
+## Type: sacmixed 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 50.35976   63.33587  0.7951 0.426542
+## INC         -0.96203    0.43539 -2.2096 0.027135
+## HOVAL       -0.29462    0.10275 -2.8674 0.004139
+## lag.INC     -0.72000    1.61312 -0.4463 0.655352
+## lag.HOVAL    0.24470    0.26967  0.9074 0.364187
+## 
+## Rho: 0.31731
+## Asymptotic standard error: 0.87681
+##     z-value: 0.36189, p-value: 0.71743
+## Lambda: 0.090483
+## Asymptotic standard error: 1.0184
+##     z-value: 0.088845, p-value: 0.92921
+## 
+## LR test value: 10.756, p-value: 0.029453
+## 
+## Log likelihood: -181.9994 for sacmixed model
+## ML residual variance (sigma squared): 95.975, (sigma: 9.7967)
+## Number of observations: 49 
+## Number of parameters estimated: 8 
+## AIC: 380, (AIC for lm: 382.75)</code></pre>
+<pre class="r"><code>#Impact: distinguish direct and indirect effects
+im4&lt;-impacts(gnm, listw = listw, zstats=TRUE, R=200)
+sums4&lt;-summary(im4,  zstats=T)
+data.frame(sums4$res)</code></pre>
+<pre><code>##       direct   indirect       total
+## 1 -1.0470529 -1.4167854 -2.46383828
+## 2 -0.2820784  0.2089587 -0.07311966</code></pre>
+<pre class="r"><code>data.frame(sums4$pzmat)</code></pre>
+<pre><code>##                  Direct  Indirect     Total
+## INC dy/dx   0.008810136 0.8853647 0.7811163
+## HOVAL dy/dx 0.107393653 0.9576303 0.9203873</code></pre>
+</div>
+</div>
+<div id="knecht-assignment" class="section level2" number="4">
+<h2><span class="header-section-number">4</span> 4.4 Knecht
+Assignment</h2>
+<p>1&amp;2.</p>
+<pre class="r"><code>library(igraph)
+library(haven) # to read Stata files
+library(reshape2)
+library(tidyverse)
+
+PupilsWaveV &lt;- read_dta(file = &quot;PupilsWaveV.dta&quot;)
+
+grep(&quot;acthomew&quot;, names(PupilsWaveV), value = TRUE)</code></pre>
+<pre><code>## [1] &quot;acthomew&quot;</code></pre>
+<pre class="r"><code>table(PupilsWaveV$acthomew)</code></pre>
+<pre><code>## 
+##    1    2    3    4    5    9 
+## 1056 1317  577   24    5    1</code></pre>
+<pre class="r"><code>table(PupilsWaveV$sex)</code></pre>
+<pre><code>## 
+##    1    2 
+## 1464 1532</code></pre>
+<pre class="r"><code>PupilsWaveV &lt;- subset(PupilsWaveV, acthomew &gt;= 1 &amp; acthomew &lt;= 5)
+PupilsWaveV$female &lt;- ifelse(PupilsWaveV$sex == 2, 0, 1)
+
+table(PupilsWaveV$acthomew)</code></pre>
+<pre><code>## 
+##    1    2    3    4    5 
+## 1056 1317  577   24    5</code></pre>
+<pre class="r"><code>table(PupilsWaveV$female)</code></pre>
+<pre><code>## 
+##    0    1 
+## 1523 1456</code></pre>
+<pre class="r"><code>PupilsWaveV$acthomew_r &lt;- 6 - PupilsWaveV$acthomew
+
+table(PupilsWaveV$acthomew_r)</code></pre>
+<pre><code>## 
+##    1    2    3    4    5 
+##    5   24  577 1317 1056</code></pre>
+<pre class="r"><code>table(PupilsWaveV$female)</code></pre>
+<pre><code>## 
+##    0    1 
+## 1523 1456</code></pre>
+<pre class="r"><code>attach(PupilsWaveV)</code></pre>
+<pre><code>## The following object is masked _by_ .GlobalEnv:
+## 
+##     sex</code></pre>
+<pre class="r"><code>summary(acthomew_r)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00    4.00    4.00    4.14    5.00    5.00</code></pre>
+<pre class="r"><code>summary(female)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.0000  0.0000  0.4888  1.0000  1.0000</code></pre>
+<pre class="r"><code>summary(age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+##   10.00   12.00   12.00   12.11   12.00   15.00      34</code></pre>
+<pre class="r"><code>reg &lt;- lm(acthomew_r ~ female + age)
+summary(reg)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = acthomew_r ~ female + age)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.1591 -0.1591 -0.1206  0.8409  0.8932 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  3.95489    0.34595  11.432   &lt;2e-16 ***
+## female       0.03849    0.02806   1.372    0.170    
+## age          0.01381    0.02843   0.486    0.627    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.7587 on 2942 degrees of freedom
+##   (34 observations deleted due to missingness)
+## Multiple R-squared:  0.0006868,  Adjusted R-squared:  7.449e-06 
+## F-statistic: 1.011 on 2 and 2942 DF,  p-value: 0.364</code></pre>
+<p>3.</p>
+<pre class="r"><code>library(lme4)
+
+multi &lt;- lmer(formula = acthomew_r ~ 1 + female + age + (1 | schoolnr), 
+               data = PupilsWaveV, REML = FALSE)
+
+summary(multi)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: acthomew_r ~ 1 + female + age + (1 | schoolnr)
+##    Data: PupilsWaveV
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    6725.9    6755.8   -3357.9    6715.9      2940 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -4.2046 -0.2911 -0.1456  1.0682  1.3970 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  schoolnr (Intercept) 0.01231  0.1109  
+##  Residual             0.56270  0.7501  
+## Number of obs: 2945, groups:  schoolnr, 125
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  4.00018    0.35036  11.417
+## female       0.03962    0.02797   1.417
+## age          0.01008    0.02877   0.350
+## 
+## Correlation of Fixed Effects:
+##        (Intr) female
+## female -0.121       
+## age    -0.998  0.082</code></pre>
+<p>4.</p>
+<pre class="r"><code>#filter class 12b
+c12b &lt;- subset(PupilsWaveV, schoolnr == &quot;12b&quot;)
+
+library(network)
+library(igraph)
+library(reshape2)
+library(tidyverse)
+
+
+elist &lt;- c12b %&gt;% 
+select(namenr, friend1:friend12) %&gt;%   # select only the &quot; best friends&quot;  network
+  pivot_longer(c(friend1:friend12)) %&gt;% 
+  filter(!is.na(value)) %&gt;% # drop the missings
+  rename(from =&quot;namenr&quot;, to = &quot;value&quot;, sourcevar= &quot;name&quot;) %&gt;% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+nodelist &lt;- c12b %&gt;% 
+  select(namenr,sex, age) %&gt;% 
+  rename(name = &quot;namenr&quot;)
+classnet &lt;- graph_from_data_frame(elist, vertices = nodelist)
+
+adjmatrix &lt;- as_adjacency_matrix(classnet, sparse = FALSE)
+adjmatrix</code></pre>
+<pre><code>##    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+## 1  0 0 1 0 0 1 0 0 0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 2  0 0 0 0 0 0 1 1 0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 3  1 1 0 0 0 1 1 0 0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 4  0 0 0 0 0 0 0 1 0  1  0  0  0  0  0  0  0  1  0  0  0  0  1  0  0  0
+## 5  0 0 0 0 0 0 0 0 0  0  0  0  0  1  0  1  0  0  0  0  0  0  0  0  1  0
+## 6  0 0 1 0 0 0 0 0 0  0  1  1  0  0  1  0  0  0  0  0  1  0  0  0  0  0
+## 7  0 1 1 0 0 0 0 0 0  1  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 8  0 0 0 1 0 0 0 0 0  1  0  0  0  0  0  0  0  1  0  0  0  0  1  0  0  0
+## 9  1 1 1 0 0 1 1 1 0  0  1  1  0  0  1  0  0  0  0  0  0  0  0  1  0  0
+## 10 0 1 0 0 0 0 0 1 0  0  0  0  0  0  1  0  0  0  0  0  0  0  1  0  0  0
+## 11 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  1  0  0  0  1  0  0  0  0  0
+## 12 1 1 1 0 0 1 1 1 0  1  0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0
+## 13 0 0 0 1 0 0 0 0 0  0  0  0  0  0  0  0  0  1  0  0  0  0  1  0  0  1
+## 14 0 0 0 1 1 0 0 0 0  0  0  0  0  0  0  0  0  1  0  0  0  0  1  0  1  0
+## 15 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 16 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0
+## 17 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0
+## 18 0 1 0 1 0 0 1 1 0  1  0  0  1  0  0  0  0  0  0  0  0  0  1  0  0  0
+## 19 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  1  0  1  0  0  0  0
+## 20 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  1  0  0  1  0  0  0  0
+## 21 0 0 0 0 0 0 0 0 0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 22 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  1  0  1  1  0  0  0  0  0  0
+## 23 0 0 0 1 0 0 0 1 0  1  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0
+## 24 0 1 0 0 0 1 0 0 1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+## 25 0 0 0 0 0 0 0 0 0  0  0  0  0  1  0  1  0  0  0  0  0  0  0  0  0  0
+## 26 0 0 0 0 0 0 0 0 0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0</code></pre>
+<pre class="r"><code>class(adjmatrix)</code></pre>
+<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre>
+<p>5.</p>
+<pre class="r"><code>library(spdep)
+library(spatialreg)
+
+listw &lt;- mat2listw(adjmatrix, style = &quot;W&quot;, zero.policy = TRUE)
+
+summary(listw)</code></pre>
+<pre><code>## Characteristics of weights list object:
+## Neighbour list object:
+## Number of regions: 26 
+## Number of nonzero links: 91 
+## Percentage nonzero weights: 13.46154 
+## Average number of links: 3.5 
+## 1 region with no links:
+## 15
+## Non-symmetric neighbours list
+## Link number distribution:
+## 
+##  0  1  2  3  4  5  7  8 10 
+##  1  4  4  5  6  3  1  1  1 
+## 4 least connected regions:
+## 16 17 21 26 with 1 link
+## 1 most connected region:
+## 9 with 10 links
+## 
+## Weights style: W 
+## Weights constants summary:
+##    n  nn S0       S1       S2
+## W 25 625 25 16.67107 103.6967</code></pre>
+<p>6.</p>
+<pre class="r"><code>moran.test(c12b$acthomew_r, listw, zero.policy = TRUE)</code></pre>
+<pre><code>## 
+##  Moran I test under randomisation
+## 
+## data:  c12b$acthomew_r  
+## weights: listw  
+## n reduced by no-neighbour observations  
+## 
+## Moran I statistic standard deviate = -1.2823, p-value = 0.9001
+## alternative hypothesis: greater
+## sample estimates:
+## Moran I statistic       Expectation          Variance 
+##       -0.24084048       -0.04166667        0.02412595</code></pre>
+<pre class="r"><code>#no no spatial dependence
+
+reg12b &lt;- lm(acthomew_r ~ female+age, data = c12b)
+lm.LMtests(reg12b, listw, test = c(&quot;LMlag&quot;, &quot;LMerr&quot;), zero.policy = TRUE)</code></pre>
+<pre><code>## Please update scripts to use lm.RStests in place of lm.LMtests</code></pre>
+<pre><code>## 
+##  Rao&#39;s score (a.k.a Lagrange multiplier) diagnostics for spatial dependence
+## 
+## data:  
+## model: lm(formula = acthomew_r ~ female + age, data = c12b)
+## test weights: listw
+## 
+## RSlag = 4.1142, df = 1, p-value = 0.04252
+## 
+## 
+##  Rao&#39;s score (a.k.a Lagrange multiplier) diagnostics for spatial dependence
+## 
+## data:  
+## model: lm(formula = acthomew_r ~ female + age, data = c12b)
+## test weights: listw
+## 
+## RSerr = 2.1604, df = 1, p-value = 0.1416</code></pre>
+<pre class="r"><code># spatial lag dependence exists
+# no spatial error dependence</code></pre>
+<p>7.</p>
+<pre class="r"><code>slm &lt;- lagsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = &quot;FALSE&quot;, zero.policy = TRUE)
+summary(slm)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = acthomew_r ~ female + age, data = c12b, listw = listw, 
+##     Durbin = &quot;FALSE&quot;, zero.policy = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -1.142192 -0.323879 -0.038523  0.455646  1.080405 
+## 
+## Type: lag 
+## Regions with no neighbours included:
+##  15 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 0.985703   3.281733  0.3004   0.7639
+## female      0.040444   0.266647  0.1517   0.8794
+## age         0.392051   0.282600  1.3873   0.1653
+## 
+## Rho: -0.38703, LR test value: 5.6789, p-value: 0.01717
+## Asymptotic standard error: 0.13865
+##     z-value: -2.7915, p-value: 0.0052465
+## Wald statistic: 7.7925, p-value: 0.0052465
+## 
+## Log likelihood: -25.8883 for lag model
+## ML residual variance (sigma squared): 0.4134, (sigma: 0.64297)
+## Number of observations: 26 
+## Number of parameters estimated: 5 
+## AIC: 61.777, (AIC for lm: 65.456)
+## LM test for residual autocorrelation
+## test value: 0.73981, p-value: 0.38972</code></pre>
+<pre class="r"><code>#inspect direct and indirect effect
+#use a simulation with 200 iterations to obtain p-values
+# ‘zstats = TRUE’ to obtain p-values
+im&lt;-impacts(slm, listw = listw, zstats=TRUE, R=200)
+sums&lt;-summary(im,  zstats=T)
+
+#effect value(simulated)
+data.frame(sums$res)</code></pre>
+<pre><code>##       direct    indirect      total
+## 1 0.04194955 -0.01279066 0.02915889
+## 2 0.40664250 -0.12398763 0.28265487</code></pre>
+<pre class="r"><code>#effect p-value(simulated)
+data.frame(sums$pzmat)</code></pre>
+<pre><code>##                 Direct  Indirect    Total
+## female dy/dx 0.9112146 0.9367278 0.902520
+## age dy/dx    0.1603031 0.2355242 0.152095</code></pre>
+<p>8.</p>
+<pre class="r"><code>sem &lt;- errorsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = FALSE, zero.policy = TRUE)
+summary(sem)</code></pre>
+<pre><code>## 
+## Call:errorsarlm(formula = acthomew_r ~ female + age, data = c12b, 
+##     listw = listw, Durbin = FALSE, zero.policy = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -1.219368 -0.362548 -0.058648  0.668676  0.912751 
+## 
+## Type: error 
+## Regions with no neighbours included:
+##  15 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 3.562833   3.153258  1.1299   0.2585
+## female      0.063223   0.173322  0.3648   0.7153
+## age         0.047439   0.258850  0.1833   0.8546
+## 
+## Lambda: -0.6606, LR test value: 4.4195, p-value: 0.03553
+## Asymptotic standard error: 0.20347
+##     z-value: -3.2466, p-value: 0.0011678
+## Wald statistic: 10.541, p-value: 0.0011678
+## 
+## Log likelihood: -26.51801 for error model
+## ML residual variance (sigma squared): 0.40272, (sigma: 0.6346)
+## Number of observations: 26 
+## Number of parameters estimated: 5 
+## AIC: 63.036, (AIC for lm: 65.456)</code></pre>
+<pre class="r"><code>sac &lt;- sacsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = FALSE, zero.policy = TRUE)
+summary(sac)</code></pre>
+<pre><code>## 
+## Call:sacsarlm(formula = acthomew_r ~ female + age, data = c12b, listw = listw, 
+##     Durbin = FALSE, zero.policy = TRUE)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.20129 -0.39250 -0.02661  0.52543  0.96313 
+## 
+## Type: sac 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 1.579810   3.250948  0.4860   0.6270
+## female      0.049605   0.187263  0.2649   0.7911
+## age         0.308392   0.289345  1.0658   0.2865
+## 
+## Rho: -0.28578
+## Asymptotic standard error: 0.16817
+##     z-value: -1.6993, p-value: 0.08926
+## Lambda: -0.46509
+## Asymptotic standard error: 0.28125
+##     z-value: -1.6536, p-value: 0.098202
+## 
+## LR test value: 7.0894, p-value: 0.028877
+## 
+## Log likelihood: -25.18307 for sac model
+## ML residual variance (sigma squared): 0.37746, (sigma: 0.61437)
+## Number of observations: 26 
+## Number of parameters estimated: 6 
+## AIC: 62.366, (AIC for lm: 65.456)</code></pre>
+<pre class="r"><code>#Impact: distinguish direct and indirect effects
+im&lt;-impacts(sac, listw = listw, zstats=TRUE, R=200)
+sums&lt;-summary(im,  zstats=T)
+data.frame(sums$res)</code></pre>
+<pre><code>##       direct    indirect      total
+## 1 0.05059934 -0.01201928 0.03858006
+## 2 0.31457037 -0.07472253 0.23984785</code></pre>
+<pre class="r"><code>data.frame(sums$pzmat)</code></pre>
+<pre><code>##                 Direct  Indirect     Total
+## female dy/dx 0.8717900 0.9055733 0.8677339
+## age dy/dx    0.3817369 0.4169770 0.3963786</code></pre>
+<p>9.</p>
+<pre class="r"><code>sdm &lt;- lagsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(sdm)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = acthomew_r ~ female + age, data = c12b, listw = listw, 
+##     Durbin = TRUE, zero.policy = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -1.135203 -0.394884 -0.070046  0.556823  1.000595 
+## 
+## Type: mixed 
+## Regions with no neighbours included:
+##  15 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)  1.20440    3.17587  0.3792   0.7045
+## female      -0.13428    0.53517 -0.2509   0.8019
+## age          0.36041    0.29359  1.2276   0.2196
+## lag.female   0.25747    0.61108  0.4213   0.6735
+## lag.age      0.11016    0.10613  1.0379   0.2993
+## 
+## Rho: -0.67899, LR test value: 4.4907, p-value: 0.034081
+## Asymptotic standard error: 0.19745
+##     z-value: -3.4389, p-value: 0.00058413
+## Wald statistic: 11.826, p-value: 0.00058413
+## 
+## Log likelihood: -25.15936 for mixed model
+## ML residual variance (sigma squared): 0.36029, (sigma: 0.60024)
+## Number of observations: 26 
+## Number of parameters estimated: 7 
+## AIC: 64.319, (AIC for lm: 66.809)
+## LM test for residual autocorrelation
+## test value: 1.8668, p-value: 0.17184</code></pre>
+<pre class="r"><code>sdem &lt;- errorsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(sdem)</code></pre>
+<pre><code>## 
+## Call:errorsarlm(formula = acthomew_r ~ female + age, data = c12b, 
+##     listw = listw, Durbin = TRUE, zero.policy = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -1.026601 -0.370501 -0.026601  0.463311  0.941782 
+## 
+## Type: error 
+## Regions with no neighbours included:
+##  15 
+## Coefficients: (asymptotic standard errors) 
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)  1.96268    3.07793  0.6377  0.52369
+## female      -0.66948    0.52570 -1.2735  0.20284
+## age          0.31653    0.28479  1.1115  0.26636
+## lag.female   0.83964    0.59342  1.4149  0.15709
+## lag.age     -0.14550    0.07921 -1.8369  0.06622
+## 
+## Lambda: -0.77077, LR test value: 4.7916, p-value: 0.028599
+## Asymptotic standard error: 0.17951
+##     z-value: -4.2937, p-value: 1.7569e-05
+## Wald statistic: 18.436, p-value: 1.7569e-05
+## 
+## Log likelihood: -25.00887 for error model
+## ML residual variance (sigma squared): 0.34276, (sigma: 0.58546)
+## Number of observations: 26 
+## Number of parameters estimated: 7 
+## AIC: 64.018, (AIC for lm: 66.809)</code></pre>
+<pre class="r"><code>gnm &lt;- sacsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(gnm)</code></pre>
+<pre><code>## 
+## Call:sacsarlm(formula = acthomew_r ~ female + age, data = c12b, listw = listw, 
+##     Durbin = TRUE, zero.policy = TRUE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -1.107697 -0.318783 -0.043815  0.504896  0.990339 
+## 
+## Type: sacmixed 
+## Coefficients: (asymptotic standard errors) 
+##               Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)  1.4932295  3.1212281  0.4784   0.6324
+## female      -0.5305867  0.5322993 -0.9968   0.3189
+## age          0.3550197  0.2890705  1.2281   0.2194
+## lag.female   0.6968227  0.5972557  1.1667   0.2433
+## lag.age     -0.0016074  0.3937229 -0.0041   0.9967
+## 
+## Rho: -0.4164
+## Asymptotic standard error: 1.134
+##     z-value: -0.36719, p-value: 0.71348
+## Lambda: -0.5705
+## Asymptotic standard error: 1.0614
+##     z-value: -0.5375, p-value: 0.59092
+## 
+## LR test value: 8.5989, p-value: 0.071945
+## 
+## Log likelihood: -24.42832 for sacmixed model
+## ML residual variance (sigma squared): 0.33852, (sigma: 0.58182)
+## Number of observations: 26 
+## Number of parameters estimated: 8 
+## AIC: 64.857, (AIC for lm: 65.456)</code></pre>
+<ol start="10" style="list-style-type: decimal">
+<li>maybe we should not use spatial model for this class 12b data. There
+is no spatial dependence at all.</li>
+</ol>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiVHV0b3JpYWw0X1NwYXRpYWwgcmVncmVzc2lvbiBhbmFseXNpcyIKYXV0aG9yOiAiWmV5dShaZXkpIgpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiCm91dHB1dDogaHRtbF9kb2N1bWVudAotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpCmBgYAoKIyMgNC4xIENvbnN0cnVjdGluZyBhIFNwYXRpYWwgV2VpZ2h0IE1hdHJpeAoKYGBge3J9CgpsaWJyYXJ5KHNwZGVwKQpsaWJyYXJ5KHNwYXRpYWxyZWcpCgojcmVhZCBkYXRhIChpdCBpcyBhbHJlYWR5IGluIHRoZSBwcm9ncmFtIHNvIGRvIG5vdCBuZWVkIHRvIGRvd25sb2FkIGl0KQpkYXRhKGNvbHVtYnVzKQpteWRhdGEgPC0gY29sdW1idXMKCiN1c2UgImF0dGFjaCIgdG8gcHJldmVudCB0eXBpbmcgIiQiIGZvciBldmVyeSB2YXJpYWJsZXMKYXR0YWNoKG15ZGF0YSkKCiNDb2wuZ2FsLm5iIHByb3ZpZGVzIGFuIGFkamFjZW5jeSBsaXN0IG9mIG5laWdoYm9ycy4gV2UgZ2l2ZSBpdCBhIGJldHRlciBuYW1lCm5laWdoYm9ycyA8LSBjb2wuZ2FsLm5iCgojY2hlY2sgdGhlIGNsYXNzIG9mIHRoZSBhZGphY2VuY3kgbGlzdApjbGFzcyhuZWlnaGJvcnMpCgoKYGBgCgpOb3RlOiBpdCBpcyBhbiDigJhuYuKAmSBvciDigJhuZWlnaGJvcmhvb2TigJkgb2JqZWN0LiBVc3VhbGx5IHdlIG5lZWQgdG8gZmlyc3QgY29udmVydCBhIGRhdGFmcmFtZSB0byDigJhuYuKAmSwgYW5kIHRoZW4gdG8gYSDigJh3ZWlnaHRlZCBsaXN0IC0gbGlzdHfigJkgb2JqZWN0LgoKYGBge3J9CiNkYXRhZnJhbWUgdG8gbmIKCiNjbGFzcyhkYXRhZnJhbWUpIDwtIOKAnG5i4oCdCiNuYjJsaXN0dyhuYmxpc3QpCmBgYAoKQW5vdGhlciBhcHByb2FjaCAod2hpY2ggaXMgbW9yZSBzdWl0YWJsZSB3aGVuIGhhdmluZyBpc29sYXRlcykgaXMgdG8gZmlyc3QgbWFrZSBhbiBhZGphY2VuY3kgbWF0cml4LiBUaGVuIHlvdSBjYW4gdXNlOiBsaXN0d1w8LW1hdDJsaXN0dyhhZGphY2VuY3ltYXRyaXgpLgoKYGBge3J9CiNjb252ZXJ0IG5iIHRvIGxpc3R3CiNzdHlsZSA9ICJXIiBtZWFucyByb3ctc3RhbmRhcmRpemUKbGlzdHcgPC0gbmIybGlzdHcobmVpZ2hib3JzLCBzdHlsZSA9ICJXIikKc3VtbWFyeShsaXN0dykKYGBgCgpXZSBzZWUgdGhhdCBhbiBhdmVyYWdlIHJlZ2lvbiBoYXMgYWJvdXQgNSBuZWlnaGJvcnMuCgojIyA0LjIgTGluZWFyIFJlZ3Jlc3Npb24gQW5hbHlzaXMKCmBgYHtyfQpzdW1tYXJ5KENSSU1FKQpzdW1tYXJ5KElOQykKc3VtbWFyeShIT1ZBTCkKCnBsb3QobmVpZ2hib3JzLCBjb29yZHMpCgpvbHNyZWcgPC0gbG0oQ1JJTUUgfiBJTkMgKyBIT1ZBTCkKc3VtbWFyeShvbHNyZWcpCmBgYAoKIyMgNC4zIFNwYXRpYWwgQW5hbHlzaXMKCiMjIyA0LjMuMSBNb3JhbuKAmXMgSSB0ZXN0CgpgYGB7cn0KI3NlZSB3aGV0aGVyIHdlIG5lZWQgYSBzcGF0aWFsIG1vZGVsIGluIHRoZSBmaXJzdCBwbGFjZQptb3Jhbi50ZXN0KENSSU1FLCBsaXN0dykKCiNudWxsIGh5cG90aGVzaXM6IG5vIHNwYXRpYWwgZGVwZW5kZW5jZQojIHA8MC4wNSAgbnVsbCBoeXBvdGhlc2lzIHJlamVjdGVkLCB3ZSBzaG91bGQgdXNlIHNwYXRpYWwgbW9kZWwKYGBgCgojIyMgNC4zLjIgTGFncmFuZ2UgbXVsdGlwbGllciB0ZXN0cyBmb3Igc3BhdGlhbCBsYWcgYW5kIHNwYXRpYWwgZXJyb3IgZGVwZW5kZW5jaWVzCgpgYGB7cn0KI3doaWNoIHR5cGUgb2Ygc3BhdGlhbCBtb2RlbHMgd2Ugc2hvdWxkIHVzZQpsbS5MTXRlc3RzKG9sc3JlZywgbGlzdHcsIHRlc3Q9YygiTE1sYWciLCAiTE1lcnIiKSkKCiNudWxsIGh5cG90aGVzaXM6bm8gc3BhdGlhbCBsYWcgZGVwZW5kZW5jZQojbnVsbCBoeXBvdGhlc2lzOm5vIHNwYXRpYWwgZXJyb3IgZGVwZW5kZW5jZQoKI2JvdGggcmVqZWN0ZWQgaW4gdGhpcyBjYXNlCmBgYAoKIyMjIDQuMy4zIFNwYXRpYWwgbGFnIG1vZGVsCgpgYGB7cn0Kc2xtIDwtIGxhZ3NhcmxtKENSSU1FIH4gSU5DICsgSE9WQUwsIGRhdGEgPSBteWRhdGEsIGxpc3R3LCBEdXJiaW4gPSAiRkFMU0UiKQpzdW1tYXJ5KHNsbSkKCiNpbnNwZWN0IGRpcmVjdCBhbmQgaW5kaXJlY3QgZWZmZWN0CiN1c2UgYSBzaW11bGF0aW9uIHdpdGggMjAwIGl0ZXJhdGlvbnMgdG8gb2J0YWluIHAtdmFsdWVzCiMg4oCYenN0YXRzID0gVFJVReKAmSB0byBvYnRhaW4gcC12YWx1ZXMKaW08LWltcGFjdHMoc2xtLCBsaXN0dyA9IGxpc3R3LCB6c3RhdHM9VFJVRSwgUj0yMDApCnN1bXM8LXN1bW1hcnkoaW0sICB6c3RhdHM9VCkKCiNlZmZlY3QgdmFsdWUoc2ltdWxhdGVkKQpkYXRhLmZyYW1lKHN1bXMkcmVzKQoKI2VmZmVjdCBwLXZhbHVlKHNpbXVsYXRlZCkKZGF0YS5mcmFtZShzdW1zJHB6bWF0KQpgYGAKCiMjIyA0LjMuNCBTcGF0aWFsIGVycm9yIG1vZGVsCgpgYGB7cn0Kc2VtIDwtIGVycm9yc2FybG0oQ1JJTUUgfiBJTkMgKyBIT1ZBTCwgZGF0YSA9IG15ZGF0YSwgbGlzdHcsIER1cmJpbiA9IEZBTFNFKQpzdW1tYXJ5KHNlbSkKYGBgCgojIyMgNC4zLjUgU3BhdGlhbCBhdXRvcmVncmVzc2l2ZSBjb21iaW5lZCBtb2RlbAoKYGBge3J9CnNhYyA8LSBzYWNzYXJsbShDUklNRSB+IElOQyArIEhPVkFMLCBkYXRhID0gbXlkYXRhLCBsaXN0dywgRHVyYmluID0gRkFMU0UpCnN1bW1hcnkoc2FjKQpgYGAKClwqYm90aCByaG8gYW5kIGxhbWRhIGFyZSBpbnNpZ25pZmljYW50IG5vdwoKYGBge3J9CiNJbXBhY3Q6IGRpc3Rpbmd1aXNoIGRpcmVjdCBhbmQgaW5kaXJlY3QgZWZmZWN0cwppbTI8LWltcGFjdHMoc2FjLCBsaXN0dyA9IGxpc3R3LCB6c3RhdHM9VFJVRSwgUj0yMDApCnN1bXMyPC1zdW1tYXJ5KGltMiwgIHpzdGF0cz1UKQpkYXRhLmZyYW1lKHN1bXMyJHJlcykKZGF0YS5mcmFtZShzdW1zMiRwem1hdCkKYGBgCgojIyMgNC4zLjYgU3BhdGlhbCBEdXJiaW4gbW9kZWwKCmBgYHtyfQpzZG0gPC0gbGFnc2FybG0oQ1JJTUUgfiBJTkMgKyBIT1ZBTCwgZGF0YSA9IG15ZGF0YSwgbGlzdHcsIER1cmJpbiA9IFRSVUUpCnN1bW1hcnkoc2RtKQoKYGBgCgpgYGB7cn0KI0ltcGFjdDogZGlzdGluZ3Vpc2ggZGlyZWN0IGFuZCBpbmRpcmVjdCBlZmZlY3RzCmltMzwtaW1wYWN0cyhzZG0sIGxpc3R3ID0gbGlzdHcsIHpzdGF0cz1UUlVFLCBSPTIwMCkKc3VtczM8LXN1bW1hcnkoaW0zLCAgenN0YXRzPVQpCmRhdGEuZnJhbWUoc3VtczMkcmVzKQpkYXRhLmZyYW1lKHN1bXMzJHB6bWF0KQpgYGAKCiMjIyA0LjMuNyBTcGF0aWFsIER1cmJpbiBlcnJvciBtb2RlbAoKYGBge3J9CnNkZW0gPC0gZXJyb3JzYXJsbShDUklNRSB+IElOQyArIEhPVkFMLCBkYXRhID0gbXlkYXRhLCBsaXN0dywgRHVyYmluID0gVFJVRSkKc3VtbWFyeShzZGVtKQpgYGAKCiMjIyA0LjMuOCBHZW5lcmFsIG5lc3RlZCBtb2RlbAoKYGBge3J9CmdubSA8LSBzYWNzYXJsbShDUklNRSB+IElOQyArIEhPVkFMLCBkYXRhID0gbXlkYXRhLCBsaXN0dywgRHVyYmluID0gVFJVRSkKc3VtbWFyeShnbm0pCmBgYAoKYGBge3J9CiNJbXBhY3Q6IGRpc3Rpbmd1aXNoIGRpcmVjdCBhbmQgaW5kaXJlY3QgZWZmZWN0cwppbTQ8LWltcGFjdHMoZ25tLCBsaXN0dyA9IGxpc3R3LCB6c3RhdHM9VFJVRSwgUj0yMDApCnN1bXM0PC1zdW1tYXJ5KGltNCwgIHpzdGF0cz1UKQpkYXRhLmZyYW1lKHN1bXM0JHJlcykKZGF0YS5mcmFtZShzdW1zNCRwem1hdCkKYGBgCgojIyA0LjQgS25lY2h0IEFzc2lnbm1lbnQKCjEmMi4KCmBgYHtyfQpsaWJyYXJ5KGlncmFwaCkKbGlicmFyeShoYXZlbikgIyB0byByZWFkIFN0YXRhIGZpbGVzCmxpYnJhcnkocmVzaGFwZTIpCmxpYnJhcnkodGlkeXZlcnNlKQoKUHVwaWxzV2F2ZVYgPC0gcmVhZF9kdGEoZmlsZSA9ICJQdXBpbHNXYXZlVi5kdGEiKQoKZ3JlcCgiYWN0aG9tZXciLCBuYW1lcyhQdXBpbHNXYXZlViksIHZhbHVlID0gVFJVRSkKCnRhYmxlKFB1cGlsc1dhdmVWJGFjdGhvbWV3KQp0YWJsZShQdXBpbHNXYXZlViRzZXgpCgpQdXBpbHNXYXZlViA8LSBzdWJzZXQoUHVwaWxzV2F2ZVYsIGFjdGhvbWV3ID49IDEgJiBhY3Rob21ldyA8PSA1KQpQdXBpbHNXYXZlViRmZW1hbGUgPC0gaWZlbHNlKFB1cGlsc1dhdmVWJHNleCA9PSAyLCAwLCAxKQoKdGFibGUoUHVwaWxzV2F2ZVYkYWN0aG9tZXcpCnRhYmxlKFB1cGlsc1dhdmVWJGZlbWFsZSkKClB1cGlsc1dhdmVWJGFjdGhvbWV3X3IgPC0gNiAtIFB1cGlsc1dhdmVWJGFjdGhvbWV3Cgp0YWJsZShQdXBpbHNXYXZlViRhY3Rob21ld19yKQp0YWJsZShQdXBpbHNXYXZlViRmZW1hbGUpCgpgYGAKCmBgYHtyfQphdHRhY2goUHVwaWxzV2F2ZVYpCgpzdW1tYXJ5KGFjdGhvbWV3X3IpCnN1bW1hcnkoZmVtYWxlKQpzdW1tYXJ5KGFnZSkKCnJlZyA8LSBsbShhY3Rob21ld19yIH4gZmVtYWxlICsgYWdlKQpzdW1tYXJ5KHJlZykKYGBgCgozXC4KCmBgYHtyfQpsaWJyYXJ5KGxtZTQpCgptdWx0aSA8LSBsbWVyKGZvcm11bGEgPSBhY3Rob21ld19yIH4gMSArIGZlbWFsZSArIGFnZSArICgxIHwgc2Nob29sbnIpLCAKICAgICAgICAgICAgICAgZGF0YSA9IFB1cGlsc1dhdmVWLCBSRU1MID0gRkFMU0UpCgpzdW1tYXJ5KG11bHRpKQpgYGAKCjRcLgoKYGBge3J9CiNmaWx0ZXIgY2xhc3MgMTJiCmMxMmIgPC0gc3Vic2V0KFB1cGlsc1dhdmVWLCBzY2hvb2xuciA9PSAiMTJiIikKCmxpYnJhcnkobmV0d29yaykKbGlicmFyeShpZ3JhcGgpCmxpYnJhcnkocmVzaGFwZTIpCmxpYnJhcnkodGlkeXZlcnNlKQoKCmVsaXN0IDwtIGMxMmIgJT4lIApzZWxlY3QobmFtZW5yLCBmcmllbmQxOmZyaWVuZDEyKSAlPiUgICAjIHNlbGVjdCBvbmx5IHRoZSAiIGJlc3QgZnJpZW5kcyIgIG5ldHdvcmsKICBwaXZvdF9sb25nZXIoYyhmcmllbmQxOmZyaWVuZDEyKSkgJT4lIAogIGZpbHRlcighaXMubmEodmFsdWUpKSAlPiUgIyBkcm9wIHRoZSBtaXNzaW5ncwogIHJlbmFtZShmcm9tID0ibmFtZW5yIiwgdG8gPSAidmFsdWUiLCBzb3VyY2V2YXI9ICJuYW1lIikgJT4lICNqdXN0IG5pY2UgZm9yIGludGVycHJldGF0aW9uCiAgcmVsb2NhdGUodG8sIC5hZnRlcj1mcm9tKSAjbW92ZSBhcm91bmQgdGhlIGNvbHVtbnMKbm9kZWxpc3QgPC0gYzEyYiAlPiUgCiAgc2VsZWN0KG5hbWVucixzZXgsIGFnZSkgJT4lIAogIHJlbmFtZShuYW1lID0gIm5hbWVuciIpCmNsYXNzbmV0IDwtIGdyYXBoX2Zyb21fZGF0YV9mcmFtZShlbGlzdCwgdmVydGljZXMgPSBub2RlbGlzdCkKCmFkam1hdHJpeCA8LSBhc19hZGphY2VuY3lfbWF0cml4KGNsYXNzbmV0LCBzcGFyc2UgPSBGQUxTRSkKYWRqbWF0cml4CgpjbGFzcyhhZGptYXRyaXgpCmBgYAoKNVwuCgpgYGB7cn0KbGlicmFyeShzcGRlcCkKbGlicmFyeShzcGF0aWFscmVnKQoKbGlzdHcgPC0gbWF0Mmxpc3R3KGFkam1hdHJpeCwgc3R5bGUgPSAiVyIsIHplcm8ucG9saWN5ID0gVFJVRSkKCnN1bW1hcnkobGlzdHcpCmBgYAoKNlwuCgpgYGB7cn0KbW9yYW4udGVzdChjMTJiJGFjdGhvbWV3X3IsIGxpc3R3LCB6ZXJvLnBvbGljeSA9IFRSVUUpCiNubyBubyBzcGF0aWFsIGRlcGVuZGVuY2UKCnJlZzEyYiA8LSBsbShhY3Rob21ld19yIH4gZmVtYWxlK2FnZSwgZGF0YSA9IGMxMmIpCmxtLkxNdGVzdHMocmVnMTJiLCBsaXN0dywgdGVzdCA9IGMoIkxNbGFnIiwgIkxNZXJyIiksIHplcm8ucG9saWN5ID0gVFJVRSkKIyBzcGF0aWFsIGxhZyBkZXBlbmRlbmNlIGV4aXN0cwojIG5vIHNwYXRpYWwgZXJyb3IgZGVwZW5kZW5jZQpgYGAKCjdcLgoKYGBge3J9CnNsbSA8LSBsYWdzYXJsbShhY3Rob21ld19yIH4gZmVtYWxlICsgYWdlLCBkYXRhID0gYzEyYiwgbGlzdHcsIER1cmJpbiA9ICJGQUxTRSIsIHplcm8ucG9saWN5ID0gVFJVRSkKc3VtbWFyeShzbG0pCgojaW5zcGVjdCBkaXJlY3QgYW5kIGluZGlyZWN0IGVmZmVjdAojdXNlIGEgc2ltdWxhdGlvbiB3aXRoIDIwMCBpdGVyYXRpb25zIHRvIG9idGFpbiBwLXZhbHVlcwojIOKAmHpzdGF0cyA9IFRSVUXigJkgdG8gb2J0YWluIHAtdmFsdWVzCmltPC1pbXBhY3RzKHNsbSwgbGlzdHcgPSBsaXN0dywgenN0YXRzPVRSVUUsIFI9MjAwKQpzdW1zPC1zdW1tYXJ5KGltLCAgenN0YXRzPVQpCgojZWZmZWN0IHZhbHVlKHNpbXVsYXRlZCkKZGF0YS5mcmFtZShzdW1zJHJlcykKCiNlZmZlY3QgcC12YWx1ZShzaW11bGF0ZWQpCmRhdGEuZnJhbWUoc3VtcyRwem1hdCkKYGBgCgo4XC4KCmBgYHtyfQpzZW0gPC0gZXJyb3JzYXJsbShhY3Rob21ld19yIH4gZmVtYWxlICsgYWdlLCBkYXRhID0gYzEyYiwgbGlzdHcsIER1cmJpbiA9IEZBTFNFLCB6ZXJvLnBvbGljeSA9IFRSVUUpCnN1bW1hcnkoc2VtKQpgYGAKCmBgYHtyfQpzYWMgPC0gc2Fjc2FybG0oYWN0aG9tZXdfciB+IGZlbWFsZSArIGFnZSwgZGF0YSA9IGMxMmIsIGxpc3R3LCBEdXJiaW4gPSBGQUxTRSwgemVyby5wb2xpY3kgPSBUUlVFKQpzdW1tYXJ5KHNhYykKCiNJbXBhY3Q6IGRpc3Rpbmd1aXNoIGRpcmVjdCBhbmQgaW5kaXJlY3QgZWZmZWN0cwppbTwtaW1wYWN0cyhzYWMsIGxpc3R3ID0gbGlzdHcsIHpzdGF0cz1UUlVFLCBSPTIwMCkKc3Vtczwtc3VtbWFyeShpbSwgIHpzdGF0cz1UKQpkYXRhLmZyYW1lKHN1bXMkcmVzKQpkYXRhLmZyYW1lKHN1bXMkcHptYXQpCmBgYAoKOVwuCgpgYGB7cn0Kc2RtIDwtIGxhZ3NhcmxtKGFjdGhvbWV3X3IgfiBmZW1hbGUgKyBhZ2UsIGRhdGEgPSBjMTJiLCBsaXN0dywgRHVyYmluID0gVFJVRSwgemVyby5wb2xpY3kgPSBUUlVFKQpzdW1tYXJ5KHNkbSkKYGBgCgpgYGB7cn0Kc2RlbSA8LSBlcnJvcnNhcmxtKGFjdGhvbWV3X3IgfiBmZW1hbGUgKyBhZ2UsIGRhdGEgPSBjMTJiLCBsaXN0dywgRHVyYmluID0gVFJVRSwgemVyby5wb2xpY3kgPSBUUlVFKQpzdW1tYXJ5KHNkZW0pCmBgYAoKYGBge3J9CmdubSA8LSBzYWNzYXJsbShhY3Rob21ld19yIH4gZmVtYWxlICsgYWdlLCBkYXRhID0gYzEyYiwgbGlzdHcsIER1cmJpbiA9IFRSVUUsIHplcm8ucG9saWN5ID0gVFJVRSkKc3VtbWFyeShnbm0pCmBgYAoKMTAuIG1heWJlIHdlIHNob3VsZCBub3QgdXNlIHNwYXRpYWwgbW9kZWwgZm9yIHRoaXMgY2xhc3MgMTJiIGRhdGEuIFRoZXJlIGlzIG5vIHNwYXRpYWwgZGVwZW5kZW5jZSBhdCBhbGwuCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Tutorial4_Spatial regression analysis.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

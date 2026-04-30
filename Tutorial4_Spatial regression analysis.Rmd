@@ -1,0 +1,331 @@
+---
+title: "Tutorial4_Spatial regression analysis"
+author: "Zeyu(Zey)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 4.1 Constructing a Spatial Weight Matrix
+
+```{r}
+
+library(spdep)
+library(spatialreg)
+
+#read data (it is already in the program so do not need to download it)
+data(columbus)
+mydata <- columbus
+
+#use "attach" to prevent typing "$" for every variables
+attach(mydata)
+
+#Col.gal.nb provides an adjacency list of neighbors. We give it a better name
+neighbors <- col.gal.nb
+
+#check the class of the adjacency list
+class(neighbors)
+
+
+```
+
+Note: it is an ‘nb’ or ‘neighborhood’ object. Usually we need to first convert a dataframe to ‘nb’, and then to a ‘weighted list - listw’ object.
+
+```{r}
+#dataframe to nb
+
+#class(dataframe) <- “nb”
+#nb2listw(nblist)
+```
+
+Another approach (which is more suitable when having isolates) is to first make an adjacency matrix. Then you can use: listw\<-mat2listw(adjacencymatrix).
+
+```{r}
+#convert nb to listw
+#style = "W" means row-standardize
+listw <- nb2listw(neighbors, style = "W")
+summary(listw)
+```
+
+We see that an average region has about 5 neighbors.
+
+## 4.2 Linear Regression Analysis
+
+```{r}
+summary(CRIME)
+summary(INC)
+summary(HOVAL)
+
+plot(neighbors, coords)
+
+olsreg <- lm(CRIME ~ INC + HOVAL)
+summary(olsreg)
+```
+
+## 4.3 Spatial Analysis
+
+### 4.3.1 Moran’s I test
+
+```{r}
+#see whether we need a spatial model in the first place
+moran.test(CRIME, listw)
+
+#null hypothesis: no spatial dependence
+# p<0.05  null hypothesis rejected, we should use spatial model
+```
+
+### 4.3.2 Lagrange multiplier tests for spatial lag and spatial error dependencies
+
+```{r}
+#which type of spatial models we should use
+lm.LMtests(olsreg, listw, test=c("LMlag", "LMerr"))
+
+#null hypothesis:no spatial lag dependence
+#null hypothesis:no spatial error dependence
+
+#both rejected in this case
+```
+
+### 4.3.3 Spatial lag model
+
+```{r}
+slm <- lagsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = "FALSE")
+summary(slm)
+
+#inspect direct and indirect effect
+#use a simulation with 200 iterations to obtain p-values
+# ‘zstats = TRUE’ to obtain p-values
+im<-impacts(slm, listw = listw, zstats=TRUE, R=200)
+sums<-summary(im,  zstats=T)
+
+#effect value(simulated)
+data.frame(sums$res)
+
+#effect p-value(simulated)
+data.frame(sums$pzmat)
+```
+
+### 4.3.4 Spatial error model
+
+```{r}
+sem <- errorsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = FALSE)
+summary(sem)
+```
+
+### 4.3.5 Spatial autoregressive combined model
+
+```{r}
+sac <- sacsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = FALSE)
+summary(sac)
+```
+
+\*both rho and lamda are insignificant now
+
+```{r}
+#Impact: distinguish direct and indirect effects
+im2<-impacts(sac, listw = listw, zstats=TRUE, R=200)
+sums2<-summary(im2,  zstats=T)
+data.frame(sums2$res)
+data.frame(sums2$pzmat)
+```
+
+### 4.3.6 Spatial Durbin model
+
+```{r}
+sdm <- lagsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(sdm)
+
+```
+
+```{r}
+#Impact: distinguish direct and indirect effects
+im3<-impacts(sdm, listw = listw, zstats=TRUE, R=200)
+sums3<-summary(im3,  zstats=T)
+data.frame(sums3$res)
+data.frame(sums3$pzmat)
+```
+
+### 4.3.7 Spatial Durbin error model
+
+```{r}
+sdem <- errorsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(sdem)
+```
+
+### 4.3.8 General nested model
+
+```{r}
+gnm <- sacsarlm(CRIME ~ INC + HOVAL, data = mydata, listw, Durbin = TRUE)
+summary(gnm)
+```
+
+```{r}
+#Impact: distinguish direct and indirect effects
+im4<-impacts(gnm, listw = listw, zstats=TRUE, R=200)
+sums4<-summary(im4,  zstats=T)
+data.frame(sums4$res)
+data.frame(sums4$pzmat)
+```
+
+## 4.4 Knecht Assignment
+
+1&2.
+
+```{r}
+library(igraph)
+library(haven) # to read Stata files
+library(reshape2)
+library(tidyverse)
+
+PupilsWaveV <- read_dta(file = "PupilsWaveV.dta")
+
+grep("acthomew", names(PupilsWaveV), value = TRUE)
+
+table(PupilsWaveV$acthomew)
+table(PupilsWaveV$sex)
+
+PupilsWaveV <- subset(PupilsWaveV, acthomew >= 1 & acthomew <= 5)
+PupilsWaveV$female <- ifelse(PupilsWaveV$sex == 2, 0, 1)
+
+table(PupilsWaveV$acthomew)
+table(PupilsWaveV$female)
+
+PupilsWaveV$acthomew_r <- 6 - PupilsWaveV$acthomew
+
+table(PupilsWaveV$acthomew_r)
+table(PupilsWaveV$female)
+
+```
+
+```{r}
+attach(PupilsWaveV)
+
+summary(acthomew_r)
+summary(female)
+summary(age)
+
+reg <- lm(acthomew_r ~ female + age)
+summary(reg)
+```
+
+3\.
+
+```{r}
+library(lme4)
+
+multi <- lmer(formula = acthomew_r ~ 1 + female + age + (1 | schoolnr), 
+               data = PupilsWaveV, REML = FALSE)
+
+summary(multi)
+```
+
+4\.
+
+```{r}
+#filter class 12b
+c12b <- subset(PupilsWaveV, schoolnr == "12b")
+
+library(network)
+library(igraph)
+library(reshape2)
+library(tidyverse)
+
+
+elist <- c12b %>% 
+select(namenr, friend1:friend12) %>%   # select only the " best friends"  network
+  pivot_longer(c(friend1:friend12)) %>% 
+  filter(!is.na(value)) %>% # drop the missings
+  rename(from ="namenr", to = "value", sourcevar= "name") %>% #just nice for interpretation
+  relocate(to, .after=from) #move around the columns
+nodelist <- c12b %>% 
+  select(namenr,sex, age) %>% 
+  rename(name = "namenr")
+classnet <- graph_from_data_frame(elist, vertices = nodelist)
+
+adjmatrix <- as_adjacency_matrix(classnet, sparse = FALSE)
+adjmatrix
+
+class(adjmatrix)
+```
+
+5\.
+
+```{r}
+library(spdep)
+library(spatialreg)
+
+listw <- mat2listw(adjmatrix, style = "W", zero.policy = TRUE)
+
+summary(listw)
+```
+
+6\.
+
+```{r}
+moran.test(c12b$acthomew_r, listw, zero.policy = TRUE)
+#no no spatial dependence
+
+reg12b <- lm(acthomew_r ~ female+age, data = c12b)
+lm.LMtests(reg12b, listw, test = c("LMlag", "LMerr"), zero.policy = TRUE)
+# spatial lag dependence exists
+# no spatial error dependence
+```
+
+7\.
+
+```{r}
+slm <- lagsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = "FALSE", zero.policy = TRUE)
+summary(slm)
+
+#inspect direct and indirect effect
+#use a simulation with 200 iterations to obtain p-values
+# ‘zstats = TRUE’ to obtain p-values
+im<-impacts(slm, listw = listw, zstats=TRUE, R=200)
+sums<-summary(im,  zstats=T)
+
+#effect value(simulated)
+data.frame(sums$res)
+
+#effect p-value(simulated)
+data.frame(sums$pzmat)
+```
+
+8\.
+
+```{r}
+sem <- errorsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = FALSE, zero.policy = TRUE)
+summary(sem)
+```
+
+```{r}
+sac <- sacsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = FALSE, zero.policy = TRUE)
+summary(sac)
+
+#Impact: distinguish direct and indirect effects
+im<-impacts(sac, listw = listw, zstats=TRUE, R=200)
+sums<-summary(im,  zstats=T)
+data.frame(sums$res)
+data.frame(sums$pzmat)
+```
+
+9\.
+
+```{r}
+sdm <- lagsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(sdm)
+```
+
+```{r}
+sdem <- errorsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(sdem)
+```
+
+```{r}
+gnm <- sacsarlm(acthomew_r ~ female + age, data = c12b, listw, Durbin = TRUE, zero.policy = TRUE)
+summary(gnm)
+```
+
+10. maybe we should not use spatial model for this class 12b data. There is no spatial dependence at all.
