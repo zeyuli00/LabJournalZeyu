@@ -13,11 +13,11 @@ navbar:
     - text: "My journal"
       menu:
       - text: "Tutorial1"
-        href: "Tutorial1_data handling.html"
+        href: "Tutorial1_data-handling.html"
       - text: "Tutorial2"
-        href: "Tutorial2_basic analysis.html"
+        href: "Tutorial2_basic-analysis.html"
       - text: "Tutorial3"
-        href: "Tutorial3_Knecht data.html"
+        href: "Tutorial3_Knecht-data.html"
         
         # here, other .Rmds can be added
 

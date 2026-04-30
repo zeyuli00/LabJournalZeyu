@@ -347,13 +347,13 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="Tutorial1_data handling.html">Tutorial1</a>
+      <a href="Tutorial1_data-handling.html">Tutorial1</a>
     </li>
     <li>
-      <a href="Tutorial2_basic analysis.html">Tutorial2</a>
+      <a href="Tutorial2_basic-analysis.html">Tutorial2</a>
     </li>
     <li>
-      <a href="Tutorial3_Knecht data.html">Tutorial3</a>
+      <a href="Tutorial3_Knecht-data.html">Tutorial3</a>
     </li>
   </ul>
 </li>
@@ -516,9 +516,9 @@ g &lt;- graph_from_adjacency_matrix(g_matrix)
 class(g)</code></pre>
 <pre><code>## [1] &quot;igraph&quot;</code></pre>
 <pre class="r"><code>g</code></pre>
-<pre><code>## IGRAPH df4f800 DN-- 5 4 -- 
+<pre><code>## IGRAPH 35d9911 DN-- 5 4 -- 
 ## + attr: name (v/c)
-## + edges from df4f800 (vertex names):
+## + edges from 35d9911 (vertex names):
 ## [1] 1-&gt;2 1-&gt;4 2-&gt;3 3-&gt;1</code></pre>
 <pre class="r"><code>plot(g)</code></pre>
 <p><img src="Tutorial1_data-handling_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /></p>
@@ -720,9 +720,9 @@ plot(g_mod)</code></pre>
 using V( )</p>
 <pre class="r"><code>V(g)$gender &lt;- c(&quot;male&quot;, &quot;female&quot;, &quot;female&quot;, &quot;other&quot;, &quot;male&quot;) 
 g</code></pre>
-<pre><code>## IGRAPH df4f800 DN-- 5 4 -- 
+<pre><code>## IGRAPH 35d9911 DN-- 5 4 -- 
 ## + attr: name (v/c), age (v/n), gender (v/c)
-## + edges from df4f800 (vertex names):
+## + edges from 35d9911 (vertex names):
 ## [1] 1-&gt;2 1-&gt;4 2-&gt;3 3-&gt;1</code></pre>
 <p>Similarly, we can use <code>E()</code> to access, add and modify edge
 attributes.</p>
